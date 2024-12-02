@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "qcp-omics"
+version = "0.1.0"
+description = "Quality control, preprocessing and analysis of omics data for machine learning"
+authors = ["Georgy Lepsaya <georgelepsaya@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "qcp_omics", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+click = "^8.1.7"
+
+[tool.poetry.scripts]
+qcp = "qcp_omics.cli.main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

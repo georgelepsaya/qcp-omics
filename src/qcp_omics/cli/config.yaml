@@ -1,0 +1,18 @@
+#input data matrix, specify column arrangement (e.g., whether samples are rows or columns, and which columns represent
+#features, outcomes, etc.), data type (genomics, proteomics, etc.), and the current level of pre-processing (raw, filtered, normalized,
+#transformed, scaled). If the data is already processed, the user would also indicate the methods previously applied. Additionally,
+#the user could specify actions such as filtering, normalizing, transforming, scaling, or visualizing data
+
+- input:
+    data_matrix: "your/data/matrix/path"
+    dataset_type: "clinical/genomics/proteomics/metabolomics"
+    current_preprocessing_level: "raw/filtered/normalised/transformed/scaled"
+    steps:
+        - identify_missing_values
+        - impute_continuous
+        - ... or simply
+        - qc_all
+        - etc.
+    output_matrix: "output/matrix/path"
+    output_report: "output/report/path"
+    output_log: "output/log/path"
