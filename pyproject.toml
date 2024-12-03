@@ -12,7 +12,7 @@ python = "^3.11"
 click = "^8.1.7"
 
 [tool.poetry.scripts]
-qcp = "qcp_omics.cli.main:main"
+qcp = "qcp_omics.cli.cli:qcp"
 
 [build-system]
 requires = ["poetry-core"]
