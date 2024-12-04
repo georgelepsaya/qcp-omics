@@ -10,6 +10,7 @@ packages = [{ include = "qcp_omics", from = "src" }]
 [tool.poetry.dependencies]
 python = "^3.11"
 click = "^8.1.7"
+pydantic = "^2.10.2"
 
 [tool.poetry.scripts]
 qcp = "qcp_omics.cli.cli:qcp"
