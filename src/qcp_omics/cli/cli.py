@@ -1,7 +1,6 @@
 import click
 from pydantic import BaseModel
-from typing import List
-
+import copy
 
 class Input(BaseModel):
     dataset_type: str
@@ -12,38 +11,70 @@ class Input(BaseModel):
     all_numeric: bool
 
 
-qc_steps: List[str] = ["identify_missing_values", "impute_continuous"]
-preprocessing_steps: List[str] = ["transform", "normalize", "scale"]
-visualization_steps: List[str] = ["visualization"]
-analysis_steps: List[str] = ["correlation", "regression", "pca"]
-all_steps: List[str] = qc_steps + preprocessing_steps + visualization_steps + analysis_steps
-previous_steps: List[str] = []
+all_steps: dict[str, list[str]] = {
+    "qc_steps": ["identify_missing_values", "impute_continuous"],
+    "preprocessing_steps": ["transform", "normalize", "scale"],
+    "visualization_steps": ["visualization"],
+    "analysis_steps": ["correlation", "regression", "pca"],
+}
+
+previous_steps: dict[str, list[str]] = {
+    "qc_steps": [],
+    "preprocessing_steps": [],
+    "visualization_steps": [],
+    "analysis_steps": []
+}
 
 
-def echo_steps() -> int:
-    steps = [s for s in all_steps if s not in previous_steps]
-    for i, step in enumerate(steps):
-        if i == 0:
-            click.echo("QC steps:")
-        elif i == len(qc_steps):
-            click.echo("Preprocessing steps:")
-        elif i == len(qc_steps + preprocessing_steps):
-            click.echo("Visualization steps:")
-        elif i == len(qc_steps + preprocessing_steps + visualization_steps):
-            click.echo("Analysis steps:")
-        click.echo(f"{i + 1}. {step}")
-    return len(steps)
+# update active steps, echo them and return amount of active steps
+def echo_steps(active_steps: dict[str, list[str]]) -> int:
+    for category, steps in previous_steps.items():
+        if category in active_steps:
+            active_steps[category] = [
+                step for step in active_steps[category] if step not in steps
+            ]
+    step_number: int = 1
+    for category, steps in active_steps.items():
+        formatted_category = category.replace("_", " ").capitalize()
+        click.echo(f"{formatted_category}:")
+        for step in steps:
+            click.echo(f"{step_number}. {step}")
+            step_number += 1
+    return step_number
 
 
-def validate_steps(steps: str, num_steps: int) -> List[int]:
+# validate selected steps and return a list of numbers of steps
+def validate_steps(steps: str, num_steps: int, stage: str) -> list[int]:
     try:
-        selected = [int(s.strip()) for s in steps.split(',')]
-        if not all(0 <= s <= num_steps for s in selected):
-            raise ValueError("All steps must be within given range")
+        selected: list[int] = [int(s.strip()) for s in steps.split(',')]
+        if 0 in selected and stage == 'to_run':
+            if len(selected) > 1:
+                raise ValueError("Either select all steps with 0 or specify steps to run (e.g., 1,2,3)")
+        if not all(1 <= s <= num_steps for s in selected if s != 0):
+            raise ValueError(f"All steps must be within 1 and {num_steps}")
         return selected
     except ValueError as e:
         raise click.BadParameter(f"Invalid input: {e}")
 
+
+def update_previous_steps(input_numbers: list[int], active: dict[str, list[str]], previous: dict[str, list[str]]) -> None:
+    step_number: int = 1
+    for category, steps in active.items():
+        for step in steps:
+            if step_number in input_numbers:
+                previous[category].append(step)
+            step_number += 1
+
+
+def get_steps_to_run(validated_steps: list[int], active_steps: dict[str, list[str]]) -> list[str]:
+    steps_to_run: list[str] = []
+    step_number = 1
+    for category, steps in active_steps.items():
+        for step in steps:
+            if step_number in validated_steps:
+                steps_to_run.append(step)
+            step_number += 1
+    return steps_to_run
 
 
 @click.command()
@@ -52,7 +83,7 @@ def qcp() -> None:
 
     cli_input: dict = dict()
 
-    dataset_type_options = ["genomics", "proteomics", "clinical"]
+    dataset_type_options: list[str] = ["genomics", "proteomics", "clinical"]
     click.echo("\nWhat is the input dataset type:")
     for i, option in enumerate(dataset_type_options, 1):
         click.echo(f"{i}. {option}")
@@ -65,45 +96,39 @@ def qcp() -> None:
     cli_input["en_headers"] = click.confirm("\nAre all headers in English?", default=True)
     cli_input["all_numeric"] = click.confirm("\nIs all data numeric?")
 
-    is_raw = click.confirm("\nIs data raw (no processing applied yet)?", default=True)
+    is_raw: bool = click.confirm("\nIs data raw (no processing applied yet)?", default=True)
+
+    active_steps = copy.deepcopy(all_steps)
+    total_steps: int
 
     if not is_raw:
         click.echo("\nSelect steps already run:")
-        num_steps = echo_steps()
+        total_steps = echo_steps(active_steps)
         steps = click.prompt(
             "\nChoose run steps (comma-separated, e.g., 1,2,3)",
             type=str
         )
-
-        global previous_steps
-        previous_steps = [all_steps[i-1] for i in validate_steps(steps, num_steps)]
+        update_previous_steps(validate_steps(steps, total_steps, "previous"), active_steps, previous_steps)
         click.echo("Previous steps you chose:")
         for s in previous_steps:
             click.echo(f"\t- {s}")
 
     click.echo("\nSelect steps you want to run:")
-    num_steps = echo_steps()
+    click.echo("0. run all steps in the given order")
+    total_steps = echo_steps(active_steps)
     steps = click.prompt(
-        "\nChoose steps in desired order (comma-separated, e.g. 1,4,3) or 0 to select all in given order",
+        "\nChoose steps in desired order (comma-separated, e.g. 1,2,3) or 0 to select all in given order",
         type=str
     )
-    steps_to_run = [all_steps[i-1] for i in validate_steps(steps, num_steps)]
+
+    validated_steps = validate_steps(steps, total_steps, "to_run")
+    steps_to_run: list[str]
+
+    if len(validated_steps) == 1 and 0 in validated_steps:
+        steps_to_run = get_steps_to_run([i + 1 for i in range(total_steps)], active_steps)
+    else:
+        steps_to_run = get_steps_to_run(validated_steps, active_steps)
     click.echo("Steps to be run:")
     for s in steps_to_run:
         click.echo(f"\t- {s}")
 
-
-
-# - input:
-#     data_matrix: "your/data/matrix/path"
-#     dataset_type: "clinical/genomics/proteomics/metabolomics"
-#     current_preprocessing_level: "raw/filtered/normalised/transformed/scaled"
-#     steps:
-#         - identify_missing_values
-#         - impute_continuous
-#         - ... or simply
-#         - qc_all
-#         - etc.
-#     output_matrix: "output/matrix/path"
-#     output_report: "output/report/path"
-#     output_log: "output/log/path"
