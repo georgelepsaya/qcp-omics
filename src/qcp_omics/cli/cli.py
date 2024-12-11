@@ -1,6 +1,7 @@
 import click
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 import copy
+import os
 
 class Input(BaseModel):
     dataset_type: str
@@ -9,6 +10,43 @@ class Input(BaseModel):
     features_cols: bool
     en_headers: bool
     all_numeric: bool
+    is_raw: bool
+    steps_to_run: list[str]
+
+    @field_validator("dataset_type")
+    @classmethod
+    def check_dataset_type_value(cls, v: str) -> str:
+        if v not in ["genomics", "proteomics", "clinical"]:
+            raise ValueError("Incorrect dataset type value")
+        return v
+
+    @field_validator("dataset_path")
+    @classmethod
+    def check_dataset_path(cls, v: str) -> str:
+        if not os.path.exists(v):
+            raise ValueError(f"Path '{v}' does not exist.")
+        if not os.path.isfile(v):
+            raise ValueError(f"Path '{v}' is not a file.")
+        if not os.access(v, os.R_OK):
+            raise ValueError(f"File '{v}' cannot be opened or read.")
+        if os.path.getsize(v) == 0:
+            raise ValueError(f"File '{v}' is empty.")
+        _, ext = os.path.splitext(v)
+        allowed_extensions = [".csv", ".tsv"]
+        if ext.lower() not in allowed_extensions:
+            raise ValueError(f"File '{v}' extension is not one of: {', '.join(allowed_extensions)}.")
+        return v
+
+    @field_validator("output_path")
+    @classmethod
+    def check_output_path(cls, v: str) -> str:
+        if not os.path.exists(v):
+            raise ValueError(f"Output path '{v}' does not exist.")
+        if not os.path.isdir(v):
+            raise ValueError(f"Output path '{v}' is not a directory.")
+        if not os.access(v, os.W_OK):
+            raise ValueError(f"Directory '{v}' is not writable.")
+        return v
 
 
 all_steps: dict[str, list[str]] = {
@@ -89,14 +127,15 @@ def qcp() -> None:
         click.echo(f"{i}. {option}")
     choice = click.prompt("Choose one (1-3)", type=click.Choice(["1", "2", "3"]), show_choices=False)
     cli_input["dataset_type"] = dataset_type_options[int(choice) - 1]
-    cli_input["dataset_path"] = click.prompt("\nPath to the source dataset", type=str),
-    cli_input["output_path"] = click.prompt("\nPath to the directory where output should be saved", type=str),
+    cli_input["dataset_path"] = click.prompt("\nPath to the source dataset", type=str)
+    cli_input["output_path"] = click.prompt("\nPath to the directory where output should be saved", type=str)
     cli_input["features_cols"] = click.confirm("\nAre features in columns and samples in rows in the input dataset?",
                                                default=True)
     cli_input["en_headers"] = click.confirm("\nAre all headers in English?", default=True)
     cli_input["all_numeric"] = click.confirm("\nIs all data numeric?")
 
     is_raw: bool = click.confirm("\nIs data raw (no processing applied yet)?", default=True)
+    cli_input["is_raw"] = is_raw
 
     active_steps = copy.deepcopy(all_steps)
     total_steps: int
@@ -131,4 +170,10 @@ def qcp() -> None:
     click.echo("Steps to be run:")
     for s in steps_to_run:
         click.echo(f"\t- {s}")
+
+    cli_input["steps_to_run"] = steps_to_run
+
+    input_model = Input(**cli_input)
+
+    print(input_model)
 
