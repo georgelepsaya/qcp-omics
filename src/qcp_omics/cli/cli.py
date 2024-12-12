@@ -5,6 +5,7 @@ import os
 import pandas as pd
 import typing as t
 from typing_extensions import Self
+import re
 
 
 class DatasetShapeWarning(Exception):
@@ -22,10 +23,17 @@ class Input(BaseModel):
     dataset_path: str
     output_path: str
     features_cols: bool
-    en_headers: bool
+    en_header: bool
     all_numeric: bool
     is_raw: bool
     steps_to_run: list[str]
+
+    def load_dataset(self) -> pd.DataFrame:
+        dataset_path = self.dataset_path
+        _, ext = os.path.splitext(dataset_path)
+        sep = "," if ext == ".csv" else "\t"
+        df = pd.read_table(dataset_path, sep=sep, index_col=0)
+        return df
 
     @field_validator("dataset_type")
     @classmethod
@@ -62,17 +70,26 @@ class Input(BaseModel):
             raise ValueError(f"Directory '{v}' is not writable.")
         return v
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def check_features_cols(self) -> Self:
-        dataset_path = self.dataset_path
-        _, ext = os.path.splitext(dataset_path)
-        sep = "," if ext == ".csv" else "\t"
-        df = pd.read_table(dataset_path, sep=sep, index_col=0)
+        df = self.load_dataset()
         shape = df.shape
-        if (self.features_cols and shape[0] <= shape[1]) or (not self.features_cols and shape[0] >= shape[1]):
-            raise DatasetShapeWarning("Features may be in rows instead of columns", shape)
+        # check for contradiction with specified shape
+        if self.features_cols and shape[0] <= shape[1]:
+            raise DatasetShapeWarning("Features may be in rows instead of columns due to detected shape", shape)
+        elif not self.features_cols and shape[0] >= shape[1]:
+            raise DatasetShapeWarning("Features may be in columns instead of rows due to detected shape", shape)
         return self
 
+    @model_validator(mode="after")
+    def check_en_headers(self) -> Self:
+        df = self.load_dataset()
+        columns = df.columns.to_list()
+        rows = df.index.to_list()
+        pattern = re.compile(r"^[a-zA-Z0-9 _\-]+$")
+        if any(not pattern.match(item) for item in columns + rows):
+            raise ValueError(f"Some values in header or index are not in English")
+        return self
 
 
 all_steps: dict[str, list[str]] = {
@@ -157,7 +174,7 @@ def qcp() -> None:
     cli_input["output_path"] = click.prompt("\nPath to the directory where output should be saved", type=str)
     cli_input["features_cols"] = click.confirm("\nAre features in columns and samples in rows in the input dataset?",
                                                default=True)
-    cli_input["en_headers"] = click.confirm("\nAre all headers in English?", default=True)
+    cli_input["en_header"] = click.confirm("\nAre all values in header and index in English?", default=True)
     cli_input["all_numeric"] = click.confirm("\nIs all data numeric?")
 
     is_raw: bool = click.confirm("\nIs data raw (no processing applied yet)?", default=True)
