@@ -66,10 +66,10 @@ class Input(BaseModel):
     def check_features_cols(self) -> Self:
         dataset_path = self.dataset_path
         _, ext = os.path.splitext(dataset_path)
-        sep = "," if ext == "csv" else "\t"
+        sep = "," if ext == ".csv" else "\t"
         df = pd.read_table(dataset_path, sep=sep, index_col=0)
         shape = df.shape
-        if shape[0] < shape[1]:
+        if (self.features_cols and shape[0] <= shape[1]) or (not self.features_cols and shape[0] >= shape[1]):
             raise DatasetShapeWarning("Features may be in rows instead of columns", shape)
         return self
 
@@ -207,5 +207,12 @@ def qcp() -> None:
         for error in errors:
             message = error["msg"]
             click.echo(message)
+        raise SystemExit("Input validation failed due to errors above. Exiting...")
     except DatasetShapeWarning as e:
-        click.echo("Found a warning")
+        click.echo(f"Found a warning: {e}")
+        confirm_shape: bool = click.confirm("Confirm that that features are indeed in columns and samples in rows",
+                      default=True)
+        if not confirm_shape:
+            raise SystemExit("Validation failed due to incorrect shape of the provided dataset. Exiting...")
+
+    click.echo("Input validation successful. Proceeding with selected steps...")
