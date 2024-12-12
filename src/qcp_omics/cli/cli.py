@@ -1,7 +1,21 @@
 import click
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, model_validator, ValidationError
 import copy
 import os
+import pandas as pd
+import typing as t
+from typing_extensions import Self
+
+
+class DatasetShapeWarning(Exception):
+    def __init__(self, message: str, value: tuple[int, int]) -> None:
+        super().__init__(message)
+        self.message = message
+        self.value = value
+
+    def __str__(self) -> str:
+        return f"{self.message}: {self.value[0]} rows, {self.value[1]} columns."
+
 
 class Input(BaseModel):
     dataset_type: str
@@ -47,6 +61,18 @@ class Input(BaseModel):
         if not os.access(v, os.W_OK):
             raise ValueError(f"Directory '{v}' is not writable.")
         return v
+
+    @model_validator(mode='after')
+    def check_features_cols(self) -> Self:
+        dataset_path = self.dataset_path
+        _, ext = os.path.splitext(dataset_path)
+        sep = "," if ext == "csv" else "\t"
+        df = pd.read_table(dataset_path, sep=sep, index_col=0)
+        shape = df.shape
+        if shape[0] < shape[1]:
+            raise DatasetShapeWarning("Features may be in rows instead of columns", shape)
+        return self
+
 
 
 all_steps: dict[str, list[str]] = {
@@ -119,7 +145,7 @@ def get_steps_to_run(validated_steps: list[int], active_steps: dict[str, list[st
 def qcp() -> None:
     click.echo("Welcome to QCP-Omics")
 
-    cli_input: dict = dict()
+    cli_input: dict[str, t.Any] = dict()
 
     dataset_type_options: list[str] = ["genomics", "proteomics", "clinical"]
     click.echo("\nWhat is the input dataset type:")
@@ -173,7 +199,13 @@ def qcp() -> None:
 
     cli_input["steps_to_run"] = steps_to_run
 
-    input_model = Input(**cli_input)
-
-    print(input_model)
-
+    try:
+        input_model = Input(**cli_input)
+    except ValidationError as validation_error:
+        errors = validation_error.errors()
+        click.echo(f"\nFound {len(errors)} error(s):")
+        for error in errors:
+            message = error["msg"]
+            click.echo(message)
+    except DatasetShapeWarning as e:
+        click.echo("Found a warning")
