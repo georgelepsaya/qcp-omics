@@ -91,11 +91,6 @@ class Input(BaseModel):
             raise ValueError(f"Some values in header or index are not in English")
         return self
 
-    @model_validator(mode="after")
-    def check_all_numeric(self) -> Self:
-        df = self.load_dataset()
-        
-
 
 all_steps: dict[str, list[str]] = {
     "qc_steps": ["identify_missing_values", "impute_continuous"],
