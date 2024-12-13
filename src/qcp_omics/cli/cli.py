@@ -87,9 +87,14 @@ class Input(BaseModel):
         columns = df.columns.to_list()
         rows = df.index.to_list()
         pattern = re.compile(r"^[a-zA-Z0-9 _\-]+$")
-        if any(not pattern.match(item) for item in columns + rows):
+        if self.en_header and any(not pattern.match(item) for item in columns + rows):
             raise ValueError(f"Some values in header or index are not in English")
         return self
+
+    @model_validator(mode="after")
+    def check_all_numeric(self) -> Self:
+        df = self.load_dataset()
+        
 
 
 all_steps: dict[str, list[str]] = {

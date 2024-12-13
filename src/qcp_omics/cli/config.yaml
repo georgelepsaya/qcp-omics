@@ -1,13 +1,12 @@
 - input:
-    data_matrix: "your/data/matrix/path"
-    dataset_type: "clinical/genomics/proteomics/metabolomics"
-    current_preprocessing_level: "raw/filtered/normalised/transformed/scaled"
-    steps:
+    dataset_type: clinical
+    dataset_path: your/data/matrix/path
+    output_path: output/matrix/path
+    features_cols: true
+    en_header: true
+    all_numeric: false
+    is_raw: true
+    steps_to_run:
         - identify_missing_values
         - impute_continuous
-        - ... or simply
-        - qc_all
-        - etc.
-    output_matrix: "output/matrix/path"
-    output_report: "output/report/path"
-    output_log: "output/log/path"
+        - etc
