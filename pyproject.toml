@@ -11,6 +11,7 @@ packages = [{ include = "qcp_omics", from = "src" }]
 python = "^3.11"
 click = "^8.1.7"
 pydantic = "^2.10.2"
+pandas = "^2.2.3"
 
 [tool.poetry.scripts]
 qcp = "qcp_omics.cli.cli:qcp"

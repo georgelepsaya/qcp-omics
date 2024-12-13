@@ -1,1 +1,8 @@
 # QCP-Omics
+
+## How to run
+
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+$ pip install poetry
+$ poetry install
