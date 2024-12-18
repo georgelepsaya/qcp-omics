@@ -18,6 +18,9 @@ class DatasetShapeWarning(Exception):
         return f"{self.message}: {self.value[0]} rows, {self.value[1]} columns."
 
 
+cli_input: dict[str, t.Any] = dict()
+
+
 class Input(BaseModel):
     dataset_type: str
     dataset_path: str
@@ -28,10 +31,16 @@ class Input(BaseModel):
     is_raw: bool
     steps_to_run: list[str]
 
+    # Validation TODO:
+    # - verify data types (numeric, categorical) for features
+    # - value ranges feasibility
+    # - duplicate entries
+
     def load_dataset(self) -> pd.DataFrame:
         dataset_path = self.dataset_path
         _, ext = os.path.splitext(dataset_path)
         sep = "," if ext == ".csv" else "\t"
+        cli_input["dataset_sep"] = sep
         df = pd.read_table(dataset_path, sep=sep, index_col=0)
         return df
 
@@ -82,7 +91,7 @@ class Input(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def check_en_headers(self) -> Self:
+    def check_en_header(self) -> Self:
         df = self.load_dataset()
         columns = df.columns.to_list()
         rows = df.index.to_list()
@@ -93,10 +102,39 @@ class Input(BaseModel):
 
 
 all_steps: dict[str, list[str]] = {
-    "qc_steps": ["identify_missing_values", "impute_continuous"],
-    "preprocessing_steps": ["transform", "normalize", "scale"],
-    "visualization_steps": ["visualization"],
-    "analysis_steps": ["correlation", "regression", "pca"],
+    "qc_steps": [
+        "identify_missing_values",
+        "detect_outliers",
+    ],
+    "preprocessing_steps": [
+        "handle_missing_values",
+        "handle_outliers",
+        "normalize_numerical_features",
+        "transform",
+        "encode_categorical_variables",
+        "scale_features",
+        "dimensionality_reduction"
+    ],
+    "visualization_steps": [
+        "distribution_numerical",
+        "distribution_categorical",
+        "visualize_outliers",
+        "correlation_heatmaps",
+        "correlation_heatmaps",
+        "feature_interdependencies",
+        "categorical_feature_relationships",
+        "visualize_dimensionality_reduction"
+    ],
+    "analysis_steps": [
+        "descriptive_statistics",
+        "group_comparisons",
+        "correlation_coefficients",
+        "multicollinearity",
+        "build_models",
+        "evaluate_model_performance",
+        "feature_importance_analysis",
+        "hypothesis_testing"
+    ],
 }
 
 previous_steps: dict[str, list[str]] = {
@@ -161,8 +199,6 @@ def get_steps_to_run(validated_steps: list[int], active_steps: dict[str, list[st
 @click.command()
 def qcp() -> None:
     click.echo("Welcome to QCP-Omics")
-
-    cli_input: dict[str, t.Any] = dict()
 
     dataset_type_options: list[str] = ["genomics", "proteomics", "clinical"]
     click.echo("\nWhat is the input dataset type:")

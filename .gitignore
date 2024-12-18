@@ -2,5 +2,7 @@
 .venv/
 __pycache__/
 .mypy_cache/
+workflows/
+sandbox/
 .DS_Store
 .gitignore
