@@ -8,6 +8,9 @@ class OmicsData(ABC):
         self.data = data
         self.metadata = metadata
 
+    def __repr__(self):
+        return f"<OmicsData(dataset_type: {self.metadata['dataset_type']})>"
+
     def map_dtypes(self):
         metadata_path = self.metadata["metadata_path"]
         with open(metadata_path, "r") as f:
@@ -40,11 +43,4 @@ class OmicsData(ABC):
             if not col_outliers.empty:
                 outliers[col] = list(col_outliers.items())
         return outliers
-
-    def execute_steps(self) -> None:
-        steps: list[str] = self.metadata["steps"]
-        self.map_dtypes()
-        data_numeric, data_categorical = self.split_numeric_categorical()
-
-
 

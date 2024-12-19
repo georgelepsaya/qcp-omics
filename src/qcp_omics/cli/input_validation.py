@@ -1,8 +1,8 @@
 from pydantic import BaseModel, field_validator, model_validator
 import os
-import pandas as pd
 from typing_extensions import Self
 import re
+from .utils import load_dataset
 
 
 class DatasetShapeWarning(Exception):
@@ -31,14 +31,6 @@ class Input(BaseModel):
     # TODO: validate metadata dtypes have all features
     # TODO: duplicate entries
 
-
-    def load_dataset(self) -> pd.DataFrame:
-        dataset_path = self.dataset_path
-        _, ext = os.path.splitext(dataset_path)
-        sep = "," if ext == ".csv" else "\t"
-        # TODO: add sep to metadata
-        df = pd.read_table(dataset_path, sep=sep, index_col=0)
-        return df
 
     @field_validator("dataset_type")
     @classmethod
@@ -77,7 +69,7 @@ class Input(BaseModel):
 
     @model_validator(mode="after")
     def check_features_cols(self) -> Self:
-        df = self.load_dataset()
+        df = load_dataset(self.dataset_path)
         shape = df.shape
         # check for contradiction with specified shape
         if self.features_cols and shape[0] <= shape[1]:
@@ -88,10 +80,15 @@ class Input(BaseModel):
 
     @model_validator(mode="after")
     def check_en_header(self) -> Self:
-        df = self.load_dataset()
+        df = load_dataset(self.dataset_path)
         columns = df.columns.to_list()
         rows = df.index.to_list()
-        pattern = re.compile(r"^[a-zA-Z0-9 _\-]+$")
-        if self.en_header and any(not pattern.match(item) for item in columns + rows):
-            raise ValueError(f"Some values in header or index are not in English")
+        pattern = re.compile(r"^[a-zA-Z0-9 ._\-]+$")
+        if self.en_header:
+            invalid_columns = [col for col in columns if not pattern.match(col)]
+            if invalid_columns:
+                raise ValueError(f"Invalid column names detected: {invalid_columns}")
+            invalid_rows = [row for row in rows if not pattern.match(row)]
+            if invalid_rows:
+                raise ValueError(f"Invalid row index values detected: {invalid_rows}")
         return self

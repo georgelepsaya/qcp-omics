@@ -1,11 +1,12 @@
 import click
 import typing as t
 import copy
+
+from .handle_execution import handle_execution
 from .utils import echo_steps, validate_steps, update_previous_steps, get_steps_to_run
 
 
 cli_input: dict[str, t.Any] = dict()
-
 all_steps: dict[str, list[str]] = {
     "qc_steps": [
         "identify_missing_values",
@@ -41,7 +42,6 @@ all_steps: dict[str, list[str]] = {
         "hypothesis_testing"
     ],
 }
-
 previous_steps: dict[str, list[str]] = {
     "qc_steps": [],
     "preprocessing_steps": [],
@@ -106,5 +106,7 @@ def interactive() -> None:
         click.echo(f"\t- {s}")
 
     cli_input["steps_to_run"] = steps_to_run
+
+    handle_execution(cli_input)
 
 

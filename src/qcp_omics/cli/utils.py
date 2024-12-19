@@ -1,4 +1,15 @@
 import click
+import pandas as pd
+import os
+
+
+def load_dataset(dataset_path) -> pd.DataFrame:
+    dataset_path = dataset_path
+    _, ext = os.path.splitext(dataset_path)
+    sep = "," if ext == ".csv" else "\t"
+    df = pd.read_table(dataset_path, sep=sep, index_col=0)
+    return df
+
 
 # update active steps, echo them and return amount of active steps
 def echo_steps(active_steps: dict[str, list[str]], previous_steps: dict[str, list[str]]) -> int:
