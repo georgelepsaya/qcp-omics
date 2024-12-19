@@ -24,6 +24,7 @@ cli_input: dict[str, t.Any] = dict()
 class Input(BaseModel):
     dataset_type: str
     dataset_path: str
+    metadata_path: str
     output_path: str
     features_cols: bool
     en_header: bool
@@ -31,10 +32,11 @@ class Input(BaseModel):
     is_raw: bool
     steps_to_run: list[str]
 
-    # Validation TODO:
-    # - verify data types (numeric, categorical) for features
-    # - value ranges feasibility
-    # - duplicate entries
+    # TODO: validate metadata path
+    # TODO: validate that metadata is a valid json file with dtypes (required)
+    # TODO: validate metadata dtypes have all features
+    # TODO: duplicate entries
+
 
     def load_dataset(self) -> pd.DataFrame:
         dataset_path = self.dataset_path
@@ -207,6 +209,7 @@ def qcp() -> None:
     choice = click.prompt("Choose one (1-3)", type=click.Choice(["1", "2", "3"]), show_choices=False)
     cli_input["dataset_type"] = dataset_type_options[int(choice) - 1]
     cli_input["dataset_path"] = click.prompt("\nPath to the source dataset", type=str)
+    cli_input["metadata_path"] = click.prompt("\nPath to the metadata file", type=str)
     cli_input["output_path"] = click.prompt("\nPath to the directory where output should be saved", type=str)
     cli_input["features_cols"] = click.confirm("\nAre features in columns and samples in rows in the input dataset?",
                                                default=True)
