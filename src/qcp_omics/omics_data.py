@@ -12,7 +12,7 @@ class OmicsData(ABC):
         metadata_path = self.metadata["metadata_path"]
         with open(metadata_path, "r") as f:
             mappings = json.load(f)
-        dtype_mapping = mappings.get('dtypes', {})
+        dtype_mapping = mappings.get("dtypes", {})
         for col, dtype in dtype_mapping.items():
             if col in self.data.columns:
                 if dtype == "category":
@@ -45,57 +45,6 @@ class OmicsData(ABC):
         steps: list[str] = self.metadata["steps"]
         self.map_dtypes()
         data_numeric, data_categorical = self.split_numeric_categorical()
-        for step in steps:
-            match step:
-                case "identify_missing_values":
-                    pass
-                case "detect_outliers":
-                    self.detect_outliers(data_numeric)
-                case "handle_missing_values":
-                    pass
-                case "handle_outliers":
-                    pass
-                case "normalize_numerical_features":
-                    pass
-                case "transform":
-                    pass
-                case "encode_categorical_variables":
-                    pass
-                case "scale_features":
-                    pass
-                case "dimensionality_reduction":
-                    pass
-                case "distribution_numerical":
-                    pass
-                case "distribution_categorical":
-                    pass
-                case "visualize_outliers":
-                    pass
-                case "correlation_heatmaps":
-                    pass
-                case "correlation_heatmaps":
-                    pass
-                case "feature_interdependencies":
-                    pass
-                case "categorical_feature_relationships":
-                    pass
-                case "visualize_dimensionality_reduction":
-                    pass
-                case "descriptive_statistics":
-                    pass
-                case "group_comparisons":
-                    pass
-                case "correlation_coefficients":
-                    pass
-                case "multicollinearity":
-                    pass
-                case "build_models":
-                    pass
-                case "evaluate_model_performance":
-                    pass
-                case "feature_importance_analysis":
-                    pass
-                case "hypothesis_testing":
-                    pass
+
 
 
