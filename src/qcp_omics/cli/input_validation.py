@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator, model_validator, ValidationError
+from pydantic import BaseModel, field_validator, model_validator
 import os
 import pandas as pd
 from typing_extensions import Self
@@ -23,6 +23,7 @@ class Input(BaseModel):
     en_header: bool
     all_numeric: bool
     is_raw: bool
+    dtypes: dict[str, str]
     steps_to_run: list[str]
 
     # TODO: validate metadata path
