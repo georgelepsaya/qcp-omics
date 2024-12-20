@@ -1,3 +1,8 @@
+from qcp_omics.report_generation.report_step import report_step
+
+
 class PreprocessingMixin:
-    def __init__(self) -> None:
+    @report_step
+    def step_preprocessing(self):
         pass
+

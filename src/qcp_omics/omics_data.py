@@ -2,6 +2,7 @@ from abc import ABC
 import pandas as pd
 import json
 import typing as t
+from qcp_omics.report_generation.report_step import report_step
 
 
 class OmicsData(ABC):
@@ -10,6 +11,7 @@ class OmicsData(ABC):
         self.data_numeric: t.Optional[pd.DataFrame] = None
         self.data_categorical: t.Optional[pd.DataFrame] = None
         self.metadata = metadata
+        self.report_data: list[dict] = []
 
 
     def __repr__(self):
@@ -58,6 +60,7 @@ class OmicsData(ABC):
         return outliers
 
 
+    @report_step
     def step_omics(self):
         pass
 

@@ -2,11 +2,11 @@ import typing as t
 import click
 from .input_validation import DatasetShapeWarning, Input
 from pydantic import ValidationError
-from qcp_omics.omics_data import OmicsData
 from qcp_omics.clinical_data import ClinicalData
 from qcp_omics.genomics_data import GenomicsData
 from .utils import load_dataset
-from ..proteomics_data import ProteomicsData
+from qcp_omics.proteomics_data import ProteomicsData
+from qcp_omics.report_generation.generate_report import generate_html_report
 
 
 def instantiate_input(metadata: dict[str, t.Any]) -> Input:
@@ -48,4 +48,4 @@ def handle_execution(metadata: dict[str, t.Any]) -> None:
     data_model.map_dtypes()
     data_model.split_numeric_categorical()
     data_model.execute_steps()
-
+    generate_html_report(data_model.report_data, metadata["report_path"])

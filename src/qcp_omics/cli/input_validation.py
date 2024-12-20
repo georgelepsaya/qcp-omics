@@ -19,6 +19,7 @@ class Input(BaseModel):
     dataset_path: str
     metadata_path: str
     output_path: str
+    report_path: str
     features_cols: bool
     en_header: bool
     all_numeric: bool
