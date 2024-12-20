@@ -45,21 +45,6 @@ class OmicsData(ABC):
         self.data_categorical = self.data.select_dtypes(include=["category"])
 
 
-    def detect_outliers(self) -> dict[str, list[tuple]]:
-        outliers = {}
-        for col in self.data_numeric.columns:
-            q1 = self.data_numeric[col].quantile(0.25)
-            q3 = self.data_numeric[col].quantile(0.75)
-            iqr = q3 - q1
-            lower_bound = q1 - 1.5 * iqr
-            upper_bound = q3 + 1.5 * iqr
-            outliers_mask = (self.data_numeric[col] < lower_bound) | (self.data_numeric[col] > upper_bound)
-            col_outliers = self.data_numeric[col][outliers_mask]
-            if not col_outliers.empty:
-                outliers[col] = list(col_outliers.items())
-        return outliers
-
-
     @report_step
     def step_omics(self):
         pass

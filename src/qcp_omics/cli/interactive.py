@@ -3,7 +3,7 @@ import typing as t
 import copy
 
 from .handle_execution import handle_execution
-from .utils import echo_steps, validate_steps, update_previous_steps, get_steps_to_run
+from qcp_omics.utils.utils import echo_steps, validate_steps, update_previous_steps, get_steps_to_run
 
 
 cli_input: dict[str, t.Any] = dict()

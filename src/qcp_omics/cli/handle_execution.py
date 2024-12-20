@@ -2,10 +2,10 @@ import typing as t
 import click
 from .input_validation import DatasetShapeWarning, Input
 from pydantic import ValidationError
-from qcp_omics.clinical_data import ClinicalData
-from qcp_omics.genomics_data import GenomicsData
-from .utils import load_dataset
-from qcp_omics.proteomics_data import ProteomicsData
+from qcp_omics.models.clinical_data import ClinicalData
+from qcp_omics.models.genomics_data import GenomicsData
+from qcp_omics.utils.utils import load_dataset
+from qcp_omics.models.proteomics_data import ProteomicsData
 from qcp_omics.report_generation.generate_report import generate_html_report
 
 

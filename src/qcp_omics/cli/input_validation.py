@@ -2,7 +2,7 @@ from pydantic import BaseModel, field_validator, model_validator
 import os
 from typing_extensions import Self
 import re
-from .utils import load_dataset
+from qcp_omics.utils.utils import load_dataset
 
 
 class DatasetShapeWarning(Exception):
