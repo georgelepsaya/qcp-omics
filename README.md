@@ -17,9 +17,10 @@
 ```
 
 Note:
-    - `"dtypes"` must represent data types for all of the columns/features of your dataset. In
+
+- `"dtypes"` must represent data types for all of the columns/features of your dataset. In
 case some of them are missing, a validation error will occur.
-    - If you choose interactive mode and still provide other fields in this file, they will be
+- If you choose interactive mode and still provide other fields in this file, they will be
 ignored.
 
 3. If you want to specify all you metadata then look at section 2.2.
