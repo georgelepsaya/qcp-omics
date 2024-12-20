@@ -56,3 +56,18 @@ class OmicsData(ABC):
             if not col_outliers.empty:
                 outliers[col] = list(col_outliers.items())
         return outliers
+
+
+    def step_omics(self):
+        pass
+
+
+    def execute_steps(self) -> None:
+        steps = self.metadata["steps_to_run"]
+        for step in steps:
+            method = getattr(self, step, None)
+            if callable(method):
+                print(f"Executing step: {step}")
+                method()
+            else:
+                print(f"Step {step} is not recognised an will be skipped.")

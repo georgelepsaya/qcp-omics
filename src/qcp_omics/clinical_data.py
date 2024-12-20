@@ -5,4 +5,5 @@ from qcp_omics.qc_mixin import QCMixin
 
 
 class ClinicalData(OmicsData, QCMixin, PreprocessingMixin, AnalysisMixin):
-    pass
+    def step_clinical(self):
+        pass

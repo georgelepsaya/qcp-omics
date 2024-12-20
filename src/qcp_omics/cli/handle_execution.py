@@ -39,12 +39,13 @@ def handle_execution(metadata: dict[str, t.Any]) -> None:
         "genomics": GenomicsData,
         "proteomics": ProteomicsData
     }
-    dataset_model_class = dataset_type_to_class.get(metadata_model["dataset_type"], {})
+    dataset_model_class = dataset_type_to_class.get(metadata_model.dataset_type, {})
     if not dataset_model_class:
         raise ValueError(f"Unsupported dataset type: {metadata['dataset_type']}")
 
-    data_model = dataset_model_class(data, metadata_model)
+    data_model = dataset_model_class(data, metadata)
     data_model.transpose()
     data_model.map_dtypes()
     data_model.split_numeric_categorical()
+    data_model.execute_steps()
 
