@@ -48,14 +48,14 @@ make sure it contains all of the following fields:
   "dataset_path": "dataset/path",
   "metadata_path": "metadata/path",
   "output_path": "output/path",
-  "features_cols": false | false,
-  "en_header": true | false,
-  "all_numeric": true | false,
-  "is_raw": true | false,
-  "steps_to_run": ["step 1", "step 2", ...],
+  "features_cols": false,
+  "en_header": true,
+  "all_numeric": false,
+  "is_raw": true,
+  "steps_to_run": ["step 1", "step 2"],
   "dtypes": {
-    "feature": "type",
-    ...
+    "feature1": "type",
+    "feature2": "type"
   }
 }
 ```
