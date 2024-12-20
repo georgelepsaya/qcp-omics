@@ -10,8 +10,8 @@
 ```json
 {
   "dtypes": {
-    "feature": "type",
-    ...
+    "feature1": "type",
+    "feature2": "type"
   }
 }
 ```
@@ -44,7 +44,7 @@ make sure it contains all of the following fields:
 
 ```json
 {
-  "dataset_type": "clinical" | "genomics" | "proteomics",
+  "dataset_type": "clinical | genomics | proteomics",
   "dataset_path": "dataset/path",
   "metadata_path": "metadata/path",
   "output_path": "output/path",
