@@ -3,7 +3,10 @@ import click
 from .input_validation import DatasetShapeWarning, Input
 from pydantic import ValidationError
 from qcp_omics.omics_data import OmicsData
+from qcp_omics.clinical_data import ClinicalData
+from qcp_omics.genomics_data import GenomicsData
 from .utils import load_dataset
+from ..proteomics_data import ProteomicsData
 
 
 def instantiate_input(metadata: dict[str, t.Any]) -> Input:
@@ -31,5 +34,17 @@ def handle_execution(metadata: dict[str, t.Any]) -> None:
     metadata_model = instantiate_input(metadata)
     data = load_dataset(metadata_model.dataset_path)
     metadata = metadata_model.model_dump()
-    data_model = OmicsData(data, metadata)
-    print(data_model)
+    dataset_type_to_class = {
+        "clinical": ClinicalData,
+        "genomics": GenomicsData,
+        "proteomics": ProteomicsData
+    }
+    dataset_model_class = dataset_type_to_class.get(metadata_model["dataset_type"], {})
+    if not dataset_model_class:
+        raise ValueError(f"Unsupported dataset type: {metadata['dataset_type']}")
+
+    data_model = dataset_model_class(data, metadata_model)
+    data_model.transpose()
+    data_model.map_dtypes()
+    data_model.split_numeric_categorical()
+
