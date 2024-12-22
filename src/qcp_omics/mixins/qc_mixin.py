@@ -4,14 +4,14 @@ from qcp_omics.utils.protocols import HasData
 
 
 class QCMixin:
-    @report_step(snapshot=True)
+    @report_step(dict_out=True)
     def identify_missing_values(self: HasData) -> dict[t.Any, float]:
         missing_values = self.data.isnull().mean() * 100
         missing = {col: pct for col, pct in missing_values.items() if pct > 0}
         return missing
 
 
-    @report_step(snapshot=False, dict_out=True)
+    @report_step(dict_out=True)
     def detect_outliers(self: HasData) -> dict[str, list[tuple]]:
         outliers = {}
         for col in self.data_numeric.columns:
@@ -25,3 +25,8 @@ class QCMixin:
             if not col_outliers.empty:
                 outliers[col] = list(col_outliers.items())
         return outliers
+
+
+    @report_step(snapshot=True)
+    def handle_outliers(self: HasData) -> None:
+        pass
