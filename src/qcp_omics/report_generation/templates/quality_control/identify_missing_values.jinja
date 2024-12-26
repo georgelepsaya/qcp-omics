@@ -1,18 +1,17 @@
 <div class="mb-5">
-    <h2 class="text-primary fs-3">{{ i + 1 }}. {{ steps[i].step | replace("_", " ") | capitalize }}</h2>
+    <h2 class="fs-5">{{ i + 1 }}. {{ steps[i].step | replace("_", " ") | capitalize }}</h2>
+    <hr class="mt-0 mb-3">
+<p>
+    The table below shows how many values (in %) are missing for each feature of the dataset.
+</p>
     <ol class="list-group list-group-numbered overflow-auto" style="max-height: 600px;">
         {% for k, v in steps[i].output.items() %}
             <li class="list-group-item d-flex justify-content-between align-items-start">
                 <div class="ms-2 me-auto">
                     <div class="fw-bold">{{ k }}</div>
-                    <ul class="list-group list-group-flush">
-                        {% for j in range(v | length) %}<li class="list-group-item"><u>{{ v[j][0] }}</u>: {{ v[j][1] }}</li>
-                        {% endfor %}
-                    </ul>
+                    {{ v | round(2) }}%
                 </div>
-                <span class="badge text-bg-primary rounded-pill">{{ v | length }}</span>
             </li>
         {% endfor %}
     </ol>
 </div>
-<hr>
