@@ -14,6 +14,7 @@ class DatasetShapeWarning(Exception):
     def __str__(self) -> str:
         return f"{self.message}: {self.value[0]} rows, {self.value[1]} columns."
 
+
 class Input(BaseModel):
     dataset_type: str
     dataset_path: str
@@ -25,7 +26,7 @@ class Input(BaseModel):
     all_numeric: bool
     is_raw: bool
     dtypes: dict[str, str]
-    steps_to_run: list[str]
+    steps_to_run: list[dict[str, str]]
 
     # TODO: validate metadata path
     # TODO: validate that metadata is a valid json file with dtypes (required)

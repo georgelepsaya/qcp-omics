@@ -53,9 +53,13 @@ class OmicsData(ABC):
     def execute_steps(self) -> None:
         steps = self.metadata["steps_to_run"]
         for step in steps:
-            method = getattr(self, step, None)
-            if callable(method):
-                print(f"Executing step: {step}")
-                method()
+            step_impl = getattr(self, step["step"], None)
+            method = step.get("method", None)
+            if callable(step_impl):
+                if method:
+                    print(f"Executing step {step['step']} with {step['method']} method...")
+                else:
+                    print(f"Executing step {step['step']}...")
+                step_impl(method=method)
             else:
-                print(f"Step {step} is not recognised an will be skipped.")
+                print(f"Step {step['step']} is not recognised an will be skipped.")
