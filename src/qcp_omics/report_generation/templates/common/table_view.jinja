@@ -1,4 +1,8 @@
-<h3 class="fs-4">Dataset snapshot</h3>
+<h3 class="fs-6">Dataset snapshot - numerical features</h3>
+<div class="table-responsive overflow-auto mb-4" style="max-height: 400px;">
+    {{ data[i].data_snapshot[0] }}
+</div>
+<h3 class="fs-6">Dataset snapshot - categorical features</h3>
 <div class="table-responsive overflow-auto" style="max-height: 400px;">
-    {{ steps[i].data.to_html(classes="table table-striped table-bordered table-hover") | safe }}
+    {{ data[i].data_snapshot[1] }}
 </div>

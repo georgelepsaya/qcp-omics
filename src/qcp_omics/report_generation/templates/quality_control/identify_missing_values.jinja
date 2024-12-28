@@ -1,21 +1,24 @@
 <div class="mb-5">
-    <h2 class="fs-5">{{ i + 1 }}. {{ steps[i].step | replace("_", " ") | capitalize }}</h2>
+    <h2 class="fs-5">{{ i + 1 }}. {{ data[i].step | replace("_", " ") | capitalize }}</h2>
     <hr class="mt-0 mb-3">
     <p>
         The list below shows how many values (in %) are missing for each feature of the dataset.
     </p>
     <ol class="list-group list-group-numbered overflow-auto" style="max-height: 600px;">
-        {% for k, v in steps[i].output.items() %}
+        {% for k, v in data[i].output.items() %}
             <li class="list-group-item d-flex justify-content-between align-items-start {{ 'bg-danger-subtle' if v > 30 else '' }}">
                 <div class="ms-2 me-auto">
-                    <div class="fw-bold">{{ k }}</div>
+                    <div class="fw-bold">
+                        <span class="me-2">{{ k }}</span>
+                        <span class="badge text-black-50">
+                            ({{ metadata['dtypes'][k] }})
+                        </span>
+                    </div>
                     {{ v | round(2) }}%
                 </div>
-                {% if v > 30 %}
-                <span class="badge text-danger-emphasis rounded-pill">drop</span>
-                {% else %}
-                <span class="badge text-primary-emphasis rounded-pill">impute</span>
-                {% endif %}
+                <span class="badge {{ 'text-danger-emphasis' if v > 30 else 'text-primary-emphasis' }} rounded-pill">
+                    {{ 'drop' if v > 30 else 'impute' }}
+                </span>
             </li>
         {% endfor %}
     </ol>

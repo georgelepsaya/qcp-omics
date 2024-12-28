@@ -1,4 +1,6 @@
 from abc import ABC
+from typing import Tuple
+
 import pandas as pd
 import json
 import typing as t
@@ -45,9 +47,10 @@ class OmicsData(ABC):
         self.data_categorical = self.data.select_dtypes(include=["category"])
 
 
-    @report_step
-    def step_omics(self):
-        pass
+    def _visualize_data_snapshot(self) -> Tuple[str, str]:
+        html_table_num = self.data_numeric.to_html(classes="table table-striped table-bordered table-hover")
+        html_table_cat = self.data_categorical.to_html(classes="table table-striped table-bordered table-hover")
+        return html_table_num, html_table_cat
 
 
     def execute_steps(self) -> None:

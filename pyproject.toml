@@ -19,6 +19,8 @@ qcp = "qcp_omics.cli.cli:qcp"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.13.0"
+scikit-learn = "^1.6.0"
+plotly = "^5.24.1"
 
 [build-system]
 requires = ["poetry-core"]

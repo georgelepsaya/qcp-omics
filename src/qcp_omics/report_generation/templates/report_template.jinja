@@ -44,10 +44,13 @@
 <body>
 <div class="container my-5">
     <h1 class="text-center mb-4 fs-4">QCP-Omics Report</h1>
-    {% for i in range(steps | length) %}
-        {% if steps[i].step == "identify_missing_values" %}
+    {% for i in range(data | length) %}
+        {% if data[i].step == "identify_missing_values" %}
             {% include "quality_control/identify_missing_values.jinja" %}
-        {% elif steps[i].step == "detect_outliers" %}
+        {% elif data[i].step == "handle_missing_values" %}
+            {% include "quality_control/handle_missing_values.jinja" %}
+        {% elif data[i].step == "detect_outliers" %}
+            {% include "quality_control/detect_outliers.jinja" %}
         {% endif %}
     {% endfor %}
 </div>

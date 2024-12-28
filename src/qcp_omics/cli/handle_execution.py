@@ -48,4 +48,4 @@ def handle_execution(metadata: dict[str, t.Any]) -> None:
     data_model.map_dtypes()
     data_model.split_numeric_categorical()
     data_model.execute_steps()
-    generate_html_report(data_model.report_data, metadata["report_path"])
+    generate_html_report(data_model.report_data, metadata, metadata["report_path"])
