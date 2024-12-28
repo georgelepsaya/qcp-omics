@@ -1,6 +1,5 @@
-<div class="mb-5">
-    <h2 class="fs-5">{{ i + 1 }}. {{ data[i].step | replace("_", " ") | capitalize }}</h2>
-    <hr class="mt-0 mb-3">
+{% extends "common/step.jinja" %}
+{% block step_content %}
     <p>
         The list below shows how many values (in %) are missing for each feature of the dataset.
     </p>
@@ -22,4 +21,4 @@
             </li>
         {% endfor %}
     </ol>
-</div>
+{% endblock %}

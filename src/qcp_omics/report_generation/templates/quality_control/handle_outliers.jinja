@@ -1,6 +1,5 @@
-<div class="mb-5">
-    <h2 class="fs-5">{{ i + 1 }}. {{ data[i].step | replace("_", " ") | capitalize }}</h2>
-    <hr class="mt-0 mb-3">
+{% extends "common/step.jinja" %}
+{% block step_content %}
     <p>
         Below is a list of outliers found for each feature of the dataset.
     </p>
@@ -22,4 +21,4 @@
         Below is the dataset after handling outliers.
     </p>
     {% include "common/table_view_num.jinja" %}
-</div>
+{% endblock %}

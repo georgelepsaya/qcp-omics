@@ -51,6 +51,14 @@
             {% include "quality_control/handle_missing_values.jinja" %}
         {% elif data[i].step == "handle_outliers" %}
             {% include "quality_control/handle_outliers.jinja" %}
+        {% elif data[i].step == "transform" %}
+            {% include "preprocessing/transform.jinja" %}
+        {% elif data[i].step == "scale_features" %}
+            {% include "preprocessing/scale_features.jinja" %}
+        {% elif data[i].step == "dimensionality_reduction" %}
+            {% include "preprocessing/dimensionality_reduction.jinja" %}
+        {% elif data[i].step == "descriptive_statistics" %}
+            {% include "analysis/descriptive_statistics.jinja" %}
         {% endif %}
     {% endfor %}
 </div>

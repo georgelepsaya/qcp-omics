@@ -1,9 +1,8 @@
-<div class="mb-5">
-    <h2 class="fs-5">{{ i + 1 }}. {{ data[i].step | replace("_", " ") | capitalize }}</h2>
-    <hr class="mt-0 mb-3">
+{% extends "common/step.jinja" %}
+{% block step_content %}
     <p>
         Below are snapshots of the dataset after this step.
     </p>
     {% include "common/table_view_num.jinja" %}
     {% include "common/table_view_cat.jinja" %}
-</div>
+{% endblock %}

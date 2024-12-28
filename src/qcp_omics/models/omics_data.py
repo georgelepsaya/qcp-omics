@@ -1,17 +1,14 @@
 from abc import ABC
-from typing import Tuple
-
+from typing import Tuple, Optional
 import pandas as pd
 import json
-import typing as t
-from qcp_omics.report_generation.report_step import report_step
 
 
 class OmicsData(ABC):
     def __init__(self, data: pd.DataFrame, metadata: dict) -> None:
         self.data = data
-        self.data_numeric: t.Optional[pd.DataFrame] = None
-        self.data_categorical: t.Optional[pd.DataFrame] = None
+        self.data_numeric: Optional[pd.DataFrame] = None
+        self.data_categorical: Optional[pd.DataFrame] = None
         self.metadata = metadata
         self.report_data: list[dict] = []
 

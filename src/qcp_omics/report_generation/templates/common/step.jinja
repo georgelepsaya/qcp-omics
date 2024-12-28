@@ -1,0 +1,5 @@
+<div class="mb-5">
+    <h2 class="fs-5">{{ i + 1 }}. {{ data[i].step | replace("_", " ") | capitalize }}</h2>
+    <hr class="mt-0 mb-3">
+    {% block step_content %}{% endblock %}
+</div>
