@@ -49,8 +49,8 @@
             {% include "quality_control/identify_missing_values.jinja" %}
         {% elif data[i].step == "handle_missing_values" %}
             {% include "quality_control/handle_missing_values.jinja" %}
-        {% elif data[i].step == "detect_outliers" %}
-            {% include "quality_control/detect_outliers.jinja" %}
+        {% elif data[i].step == "handle_outliers" %}
+            {% include "quality_control/handle_outliers.jinja" %}
         {% endif %}
     {% endfor %}
 </div>

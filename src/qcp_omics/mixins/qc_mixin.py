@@ -44,6 +44,26 @@ class QCMixin:
         return outliers
 
 
+    @staticmethod
+    def _detect_outliers_zscore(df: pd.DataFrame, threshold: float = 3.0) -> dict[str, list[tuple]]:
+        outliers = {}
+        for col in df.columns:
+            z_scores = np.abs((df[col] - df[col].mean()) / df[col].std())
+            outliers_mask = z_scores > threshold
+            col_outliers = df[col][outliers_mask]
+            if not col_outliers.empty:
+                outliers[col] = list(col_outliers.items())
+        return outliers
+
+
+    def _detect_outliers(self: T, method="iqr") -> dict[str, list[tuple]]:
+        if method == "zscore":
+            outliers = self._detect_outliers_zscore(self.data_numeric)
+        else:
+            outliers = self._detect_outliers_iqr(self.data_numeric)
+        return outliers
+
+
     @report_step(output=True)
     def identify_missing_values(self: T, method=None) -> dict[Any, float]:
         return self._identify_missing_values(self.data_numeric) | self._identify_missing_values(self.data_categorical)
@@ -64,17 +84,13 @@ class QCMixin:
         self._impute_mode()
         if method == "impute_mean":
             self._impute_mean()
-        return
 
 
-    @report_step(output=True)
-    def detect_outliers(self: T, method="IQR") -> dict[str, list[tuple]]:
-        outliers = {}
-        if method == "IQR":
-            self._detect_outliers_iqr(self.data_numeric)
+    @report_step(snapshot=True, output=True)
+    def handle_outliers(self: T, method="iqr") -> dict[str, list[tuple]]:
+        outliers = self._detect_outliers(method=method)
+        for col, outliers_list in outliers.items():
+            median_value = self.data_numeric[col].median()
+            for index, _ in outliers_list:
+                self.data_numeric.at[index, col] = median_value
         return outliers
-
-
-    @report_step(snapshot=True)
-    def handle_outliers(self: HasData, method="capping") -> None:
-        pass
