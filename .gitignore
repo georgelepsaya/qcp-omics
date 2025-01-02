@@ -6,3 +6,5 @@ workflows/
 sandbox/
 .DS_Store
 .gitignore
+dist/
+.github/

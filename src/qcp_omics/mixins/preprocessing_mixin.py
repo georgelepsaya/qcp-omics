@@ -12,7 +12,7 @@ T = TypeVar("T", bound=HasData)
 
 class PreprocessingMixin:
     @report_step(snapshot=True)
-    def scale_features(self: T, method="standard_scaler") -> None:
+    def scale_numerical_features(self: T, method="standard_scaler") -> None:
         if method == "standard_scaler":
             scaler = StandardScaler()
         elif method == "robust_scaler":
@@ -28,7 +28,7 @@ class PreprocessingMixin:
 
 
     @report_step(snapshot=True)
-    def transform(self: T, method="box-cox") -> None:
+    def transform_numerical_features(self: T, method="box-cox") -> None:
         min_val = self.data_numeric.min().min()
         if min_val <= 0:
             shift = abs(min_val) + 1
@@ -49,6 +49,35 @@ class PreprocessingMixin:
 
 
     @report_step()
+    def split_train_test(self):
+        pass
+
+
+    @report_step()
+    def split_numerical_categorical(self):
+        pass
+
+
+    @report_step()
+    def encode_categorical(self):
+        pass
+
+
+    @report_step()
+    def remove_highly_correlated_features(self):
+        pass
+
+
+    @report_step()
+    def create_new_features(self):
+        pass
+
+
+    @report_step()
     def dimensionality_reduction(self: T, method="PCA"):
         pass
 
+
+    @report_step()
+    def feature_selection(self):
+        pass

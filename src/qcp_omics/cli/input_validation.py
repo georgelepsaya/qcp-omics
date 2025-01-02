@@ -21,6 +21,7 @@ class Input(BaseModel):
     metadata_path: str
     output_path: str
     report_path: str
+    target_feature: str
     features_cols: bool
     en_header: bool
     all_numeric: bool
@@ -28,10 +29,11 @@ class Input(BaseModel):
     dtypes: dict[str, str]
     steps_to_run: list[dict[str, str]]
 
+
     # TODO: validate metadata path
     # TODO: validate that metadata is a valid json file with dtypes (required)
     # TODO: validate metadata dtypes have all features
-    # TODO: duplicate entries
+    # TODO: validate target feature
 
 
     @field_validator("dataset_type")
@@ -40,6 +42,7 @@ class Input(BaseModel):
         if v not in ["genomics", "proteomics", "clinical"]:
             raise ValueError("Incorrect dataset type value")
         return v
+
 
     @field_validator("dataset_path")
     @classmethod
@@ -58,6 +61,7 @@ class Input(BaseModel):
             raise ValueError(f"File '{v}' extension is not one of: {', '.join(allowed_extensions)}.")
         return v
 
+
     @field_validator("output_path")
     @classmethod
     def check_output_path(cls, v: str) -> str:
@@ -69,6 +73,7 @@ class Input(BaseModel):
             raise ValueError(f"Directory '{v}' is not writable.")
         return v
 
+
     @model_validator(mode="after")
     def check_features_cols(self) -> Self:
         df = load_dataset(self.dataset_path)
@@ -79,6 +84,7 @@ class Input(BaseModel):
         elif not self.features_cols and shape[0] >= shape[1]:
             raise DatasetShapeWarning("Features may be in columns instead of rows due to detected shape", shape)
         return self
+
 
     @model_validator(mode="after")
     def check_en_header(self) -> Self:

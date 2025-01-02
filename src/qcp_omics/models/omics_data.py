@@ -62,4 +62,4 @@ class OmicsData(ABC):
                     print(f"Executing step {step['step']}...")
                 step_impl(method=method)
             else:
-                print(f"Step {step['step']} is not recognised an will be skipped.")
+                print(f"Step {step['step']} is not recognised and will be skipped.")
