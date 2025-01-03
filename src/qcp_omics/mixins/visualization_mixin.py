@@ -15,6 +15,10 @@ class VisualizationMixin:
     @staticmethod
     def _histograms(df):
         columns = df.columns
+
+        if len(columns) == 0:
+            return "<p>There are no columns in the forwarded dataset to generate histograms.</p>"
+
         rows = math.ceil(len(columns) / 5)
 
         fig = sp.make_subplots(rows=rows, cols=5, subplot_titles=columns)
@@ -38,6 +42,10 @@ class VisualizationMixin:
 
     @staticmethod
     def _box_plots(df, columns):
+
+        if len(columns) == 0:
+            return "<p>There are no outliers</p>"
+
         rows = math.ceil(len(columns) / 5)
 
         fig = sp.make_subplots(rows=rows, cols=5, subplot_titles=columns)

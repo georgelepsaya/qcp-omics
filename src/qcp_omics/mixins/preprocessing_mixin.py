@@ -5,7 +5,7 @@ from sklearn.decomposition import PCA
 from scipy.stats import boxcox
 import numpy as np
 from qcp_omics.report_generation.report_step import report_step
-from typing import TypeVar
+from typing import TypeVar, Optional
 from qcp_omics.utils.protocols import HasData
 
 
@@ -36,6 +36,9 @@ class PreprocessingMixin:
         else:
             raise ValueError(f"Unsupported scaling method: {method}")
 
+        if len(self.data_numerical.columns) == 0:
+            return
+
         self.data_numerical = pd.DataFrame(
             scaler.fit_transform(self.data_numerical),
             columns=self.data_numerical.columns,
@@ -64,7 +67,11 @@ class PreprocessingMixin:
             raise ValueError(f"Unsupported transformation method: {method}")
 
 
-    def _run_pca(self: T) -> dict:
+    def _run_pca(self: T) -> Optional[dict]:
+
+        if len(self.data_numerical.columns) == 0:
+            return
+
         pca = PCA()
         pca.fit(self.data_numerical)
         pca_data = pca.transform(self.data_numerical)
@@ -82,6 +89,10 @@ class PreprocessingMixin:
     @report_step(output=True)
     def dimensionality_reduction(self: T, method=None):
         result = self._run_pca()
+
+        if result is None:
+            return
+
         pca_data, per_var, cumulative_var = result.values()
         exp_variance_plot = self._explained_variance(cumulative_var)
 

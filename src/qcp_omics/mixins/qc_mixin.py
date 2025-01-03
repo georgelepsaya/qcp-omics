@@ -39,7 +39,7 @@ class QCMixin:
         imputed_df = pd.DataFrame(
             imputed_values,
             columns=data_categorical.columns,
-            index=data_categorical.index
+            index=data_categorical.index,
         )
         self.data[data_categorical.columns] = imputed_df
         for col in data_categorical.columns:
@@ -90,6 +90,8 @@ class QCMixin:
     @report_step(snapshot="combined")
     def handle_missing_values(self: T, method=None):
         miss_cols = self._identify_missing_values(self.data)
+        if not miss_cols:
+            return
         for col, miss in miss_cols.items():
             if miss >= 30:
                 self.data.drop(col, axis=1, inplace=True)

@@ -35,11 +35,6 @@ class OmicsData(ABC):
                     self.data[col] = self.data[col].astype("float")
 
 
-    # def split_numeric_categorical(self):
-    #     self.data_numeric = self.data.select_dtypes(include=["float", "int"])
-    #     self.data_categorical = self.data.select_dtypes(include=["category"])
-
-
     @staticmethod
     def _visualize_data_snapshot(df: pd.DataFrame) -> str:
         html_table = df.to_html(classes="table table-striped table-bordered table-hover")

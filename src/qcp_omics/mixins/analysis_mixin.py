@@ -9,6 +9,9 @@ T = TypeVar("T", bound=HasData)
 class AnalysisMixin:
     @report_step(output=True)
     def descriptive_statistics(self: T, method=None):
+        if len(self.data_numerical.columns) == 0:
+            return
+
         basic_stats = self.data_numerical.describe(include='all').T
 
         basic_stats['kurtosis'] = self.data_numerical.kurt()

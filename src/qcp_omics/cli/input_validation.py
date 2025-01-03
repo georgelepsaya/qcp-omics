@@ -159,6 +159,14 @@ class Input(BaseModel):
 
 
     @model_validator(mode="after")
+    def check_size(self) -> Self:
+        df = load_dataset(self.dataset_path)
+        if len(df.columns) < 1:
+            raise ValueError("There can't be less than two columns in the dataset.")
+        return self
+
+
+    @model_validator(mode="after")
     def check_dtypes(self) -> Self:
         df = load_dataset(self.dataset_path)
         if not self.features_cols:
@@ -223,7 +231,7 @@ class Input(BaseModel):
         if self.is_raw is True:
             if len(self.steps_to_run) != len(ALL_STEPS):
                 raise ValueError(
-                    "steps_to_run error: is_raw=False requires that you run ALL steps, "
+                    "steps_to_run error: is_raw=True requires that you run ALL steps, "
                     "but the steps_to_run list does not include every step."
                 )
 
