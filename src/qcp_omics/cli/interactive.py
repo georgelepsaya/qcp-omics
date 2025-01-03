@@ -8,6 +8,7 @@ from qcp_omics.utils.utils import (
     remove_previous_steps,
     prompt_steps_to_run,
     prompt_methods_if_needed,
+    handle_json_input
 )
 
 
@@ -58,7 +59,7 @@ def interactive() -> None:
     click.echo("Welcome to QCP-Omics")
 
     # Basic prompts for dataset info
-    dataset_type_options: list[str] = ["genomics", "proteomics", "clinical"]
+    dataset_type_options: list[str] = ["clinical", "genomics", "proteomics"]
     click.echo("\nWhat is the input dataset type:")
     for i, option in enumerate(dataset_type_options, 1):
         click.echo(f"{i}. {option}")
@@ -70,7 +71,6 @@ def interactive() -> None:
     output_path = click.prompt("\nPath to the directory where output should be saved", type=str)
     features_cols = click.confirm("\nAre features in columns and samples in rows in the input dataset?", default=True)
     en_header = click.confirm("\nAre all values in header and index in English?", default=True)
-    all_numeric = click.confirm("\nIs all data numeric?")
     is_raw = click.confirm("\nIs data raw (no processing applied yet)?", default=True)
 
     # Prepare the input dictionary for handle_execution
@@ -79,9 +79,9 @@ def interactive() -> None:
         "dataset_path": dataset_path,
         "metadata_path": metadata_path,
         "output_path": output_path,
+        "report_path": output_path,
         "features_cols": features_cols,
         "en_header": en_header,
-        "all_numeric": all_numeric,
         "is_raw": is_raw
     }
 
@@ -111,6 +111,10 @@ def interactive() -> None:
         else:
             click.echo(f"  - {s['step']}")
 
+
+    input_metadata = handle_json_input(cli_input["metadata_path"])
+
+    cli_input["dtypes"] = input_metadata["dtypes"]
     cli_input["steps_to_run"] = steps_to_run
 
     handle_execution(cli_input)

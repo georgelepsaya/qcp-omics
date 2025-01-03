@@ -10,24 +10,48 @@ from qcp_omics.report_generation.generate_report import generate_html_report
 
 
 def instantiate_input(metadata: dict[str, t.Any]) -> Input:
+    """
+    Attempt to create the Input model, catching ValidationError and DatasetShapeWarning.
+    - If validation fails, exit immediately.
+    - If DatasetShapeWarning is raised, prompt user. If they confirm, set shape_override=True and re-try.
+    """
     try:
-        metadata_model = Input(**metadata)
-    except ValidationError as validation_error:
-        errors = validation_error.errors()
+        model = Input(**metadata)
+    except ValidationError as ve:
+        errors = ve.errors()
         click.echo(f"\nFound {len(errors)} validation error(s):")
         for error in errors:
-            click.echo(error["msg"])
+            click.echo(f"  - {error['msg']}")
         raise SystemExit("Input validation failed. Exiting...")
     except DatasetShapeWarning as shape_warning:
-        click.echo(f"Warning: {shape_warning}")
+        click.echo(f"\nWarning: {shape_warning}")
         if not click.confirm(
-                "Confirm that features are in columns and samples are in rows",
-                default=True
+            "Dataset shape may be inconsistent with 'features_cols'. Continue anyway?",
+            default=True
         ):
             raise SystemExit("Dataset shape validation failed. Exiting...")
+
+        # If user confirmed, set shape_override = True, then retry.
+        metadata["shape_override"] = True
+        # Second attempt:
+        try:
+            model = Input(**metadata)
+        except ValidationError as ve2:
+            errors = ve2.errors()
+            click.echo(f"\nFound {len(errors)} validation error(s) on second attempt:")
+            for error in errors:
+                click.echo(f"  - {error['msg']}")
+            raise SystemExit("Input validation failed. Exiting...")
+        except DatasetShapeWarning as shape_warning2:
+            click.echo(f"\nWarning: {shape_warning2}")
+            raise SystemExit("Dataset shape validation still failed. Exiting...")
+
+        click.echo("Shape mismatch warning overridden. Input validation successful.")
+        return model
     else:
+        # No exceptions raised
         click.echo("Input validation successful.")
-        return metadata_model
+        return model
 
 
 def handle_execution(metadata: dict[str, t.Any]) -> None:

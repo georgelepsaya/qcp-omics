@@ -20,8 +20,8 @@ def handle_json_input(input_path: str) -> dict[str, Any]:
     try:
         with open(input_path, "r") as f:
             input_metadata = json.load(f)
-    except json.JSONDecodeError as e:
-        raise click.UsageError(f"Invalid JSON file: {e}")
+    except Exception as e:
+        raise click.UsageError(f"Could not open file: {e}")
     return input_metadata
 
 
