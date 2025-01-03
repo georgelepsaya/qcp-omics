@@ -21,7 +21,6 @@ class Input(BaseModel):
     metadata_path: str
     output_path: str
     report_path: str
-    target_feature: str
     features_cols: bool
     en_header: bool
     all_numerical: bool

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from qcp_omics.report_generation.report_step import report_step
-from typing import TypeVar, Any, Tuple
+from typing import TypeVar, Any
 from qcp_omics.utils.protocols import HasData
 from sklearn.impute import SimpleImputer
 
@@ -88,14 +88,13 @@ class QCMixin:
 
 
     @report_step(snapshot="combined")
-    def handle_missing_values(self: T, method="impute_mean"):
+    def handle_missing_values(self: T, method=None):
         miss_cols = self._identify_missing_values(self.data)
         for col, miss in miss_cols.items():
             if miss >= 30:
                 self.data.drop(col, axis=1, inplace=True)
         self._impute_mode()
-        if method == "impute_mean":
-            self._impute_mean()
+        self._impute_mean()
 
 
     @report_step(snapshot="combined", output=True)
