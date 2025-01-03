@@ -31,7 +31,7 @@ ALL_STEPS: list[dict] = [
     },
     {
       "step": "scale_numerical_features",
-      "methods": "standard_scaler"
+      "methods": ["standard_scaler", "robust_scaler"]
     },
     {
       "step": "transform_numerical_features",
