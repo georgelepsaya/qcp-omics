@@ -74,8 +74,7 @@ class QCMixin:
         return outliers
 
 
-    def _detect_outliers(self: T, method="iqr") -> dict[str, list[tuple]]:
-        data_numerical = self.data.select_dtypes(include=["float", "int"])
+    def _detect_outliers(self: T, data_numerical, method="iqr") -> dict[str, list[tuple]]:
         if method == "zscore":
             outliers = self._detect_outliers_zscore(data_numerical)
         else:
@@ -100,10 +99,19 @@ class QCMixin:
 
 
     @report_step(snapshot="combined", output=True)
-    def handle_outliers(self: T, method="iqr") -> dict[str, list[tuple]]:
-        outliers = self._detect_outliers(method=method)
+    def handle_outliers(self: T, method="iqr") -> dict:
+        data_numerical = self.data.select_dtypes(include=["float", "int"])
+
+        outliers = self._detect_outliers(data_numerical, method=method)
+
         for col, outliers_list in outliers.items():
             median_value = self.data[col].median()
             for index, _ in outliers_list:
                 self.data.at[index, col] = median_value
-        return outliers
+
+        boxplots = self._box_plots(data_numerical, list(outliers.keys()))
+
+        return {
+            "outliers": outliers,
+            "boxplots": boxplots
+        }

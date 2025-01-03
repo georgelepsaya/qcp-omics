@@ -4,7 +4,7 @@
         Below is a list of outliers found for each feature of the dataset.
     </p>
     <ol class="list-group list-group-numbered overflow-auto" style="max-height: 600px;">
-        {% for k, v in data[i].output.items() %}
+        {% for k, v in data[i].output["outliers"].items() %}
             <li class="list-group-item d-flex justify-content-between align-items-start">
                 <div class="ms-2 me-auto">
                     <div class="fw-bold">{{ k }}</div>
@@ -17,6 +17,10 @@
             </li>
         {% endfor %}
     </ol>
+    <p>Box plots</p>
+    <div class="d-flex justify-content-center">
+    {{ data[i].output["boxplots"] }}
+    </div>
     <p>
         Below is the dataset after handling outliers.
     </p>

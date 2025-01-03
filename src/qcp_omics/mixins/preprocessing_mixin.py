@@ -27,16 +27,6 @@ class PreprocessingMixin:
         self.data_categorical = self.data.select_dtypes(include=["category"])
 
 
-    @report_step()
-    def remove_highly_correlated_features(self: T, method=None):
-        pass
-
-
-    @report_step()
-    def create_new_features(self: T, method=None):
-        pass
-
-
     @report_step(snapshot="numerical")
     def scale_numerical_features(self: T, method="standard_scaler") -> None:
         if method == "standard_scaler":
@@ -111,10 +101,3 @@ class PreprocessingMixin:
             "explained_variance": exp_variance_plot,
             "pca_plot": pca_plot
         }
-
-
-
-
-    @report_step()
-    def feature_selection(self: T, method=None):
-        pass

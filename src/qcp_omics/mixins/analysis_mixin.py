@@ -28,11 +28,9 @@ class AnalysisMixin:
         }
 
 
-    @report_step()
-    def evaluate_distribution_target(self: T, method=None):
-        pass
-
-
-    @report_step()
+    @report_step(output=True)
     def evaluate_distribution_features(self: T, method=None):
-        pass
+        hist_plots = self._histograms(self.data_numerical)
+        return {
+            "hist_plots": hist_plots
+        }
