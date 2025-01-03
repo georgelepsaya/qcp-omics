@@ -9,7 +9,7 @@ T = TypeVar("T", bound=HasData)
 class AnalysisMixin:
     @report_step(output=True)
     def descriptive_statistics(self: T, method=None):
-        if len(self.data_numerical.columns) == 0:
+        if self.data_numerical is None or len(self.data_numerical.columns) == 0:
             return
 
         basic_stats = self.data_numerical.describe(include='all').T
@@ -22,6 +22,9 @@ class AnalysisMixin:
 
     @report_step(output=True)
     def pairwise_correlations_numerical(self: T, method: Literal["pearson", "spearman"] = "pearson"):
+        if self.data_numerical is None or len(self.data_numerical) == 0:
+            return
+
         corr_matrix = self.data_numerical.corr(method=method)
         heatmap = self._heatmap(corr_matrix)
 
@@ -33,6 +36,9 @@ class AnalysisMixin:
 
     @report_step(output=True)
     def evaluate_distribution_features(self: T, method=None):
+        if self.data_numerical is None or len(self.data_numerical) == 0:
+            return
+
         hist_plots = self._histograms(self.data_numerical)
         return {
             "hist_plots": hist_plots

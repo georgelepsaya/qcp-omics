@@ -23,6 +23,7 @@ qcp = "qcp_omics.cli.cli:qcp"
 mypy = "^1.13.0"
 twine = "^6.0.1"
 pytest = "^8.3.4"
+pytest-cov = "^6.0.0"
 
 [build-system]
 requires = ["poetry-core"]

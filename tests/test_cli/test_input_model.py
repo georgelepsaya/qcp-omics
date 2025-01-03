@@ -1,6 +1,5 @@
 import os
 import pytest
-import pandas as pd
 from pydantic import ValidationError
 
 from qcp_omics.cli.input_validation import Input, DatasetShapeWarning, ALL_STEPS

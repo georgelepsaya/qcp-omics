@@ -21,6 +21,8 @@ class QCMixin:
     def _impute_mean(self: T) -> None:
         imputer = SimpleImputer(strategy="mean")
         data_numerical = self.data.select_dtypes(include=["float", "int"])
+        if len(data_numerical.columns) == 0:
+            return
         imputed_values = imputer.fit_transform(data_numerical)
         imputed_df = pd.DataFrame(
             imputed_values,
@@ -35,6 +37,8 @@ class QCMixin:
     def _impute_mode(self: T) -> None:
         imputer = SimpleImputer(strategy="most_frequent")
         data_categorical = self.data.select_dtypes(include=["category"])
+        if len(data_categorical.columns) == 0:
+            return
         imputed_values = imputer.fit_transform(data_categorical)
         imputed_df = pd.DataFrame(
             imputed_values,
@@ -94,6 +98,7 @@ class QCMixin:
             return
         for col, miss in miss_cols.items():
             if miss >= 30:
+                print("here 2")
                 self.data.drop(col, axis=1, inplace=True)
         self._impute_mode()
         self._impute_mean()
