@@ -54,8 +54,9 @@ class OmicsData(ABC):
             if callable(step_impl):
                 if method:
                     print(f"Executing step {step['step']} with {step['method']} method...")
+                    step_impl(method=method)
                 else:
                     print(f"Executing step {step['step']}...")
-                step_impl(method=method)
+                    step_impl()
             else:
                 print(f"Step {step['step']} is not recognised and will be skipped.")

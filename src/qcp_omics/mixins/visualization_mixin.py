@@ -36,9 +36,7 @@ class VisualizationMixin:
         return fig.to_html(full_html=False)
 
 
-    def scatter_plot(self: T):
-        pass
-
-
-    def heatmap(self: T):
-        pass
+    @staticmethod
+    def _heatmap(corr_df):
+        fig = px.imshow(corr_df, width=800, height=800)
+        return fig.to_html(full_html=False)
