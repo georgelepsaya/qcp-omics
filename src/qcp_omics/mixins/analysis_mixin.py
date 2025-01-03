@@ -7,20 +7,20 @@ T = TypeVar("T", bound=HasData)
 
 
 class AnalysisMixin:
-    @report_step(snapshot=True)
+    @report_step()
     def descriptive_statistics(self: T, method=None):
         pass
 
     @report_step()
-    def pairwise_correlations_numerical(self: T):
+    def pairwise_correlations_numerical(self: T, method=None):
         pass
 
 
     @report_step()
-    def evaluate_distribution_target(self: T):
+    def evaluate_distribution_target(self: T, method=None):
         pass
 
 
     @report_step()
-    def evaluate_distribution_features(self: T):
+    def evaluate_distribution_features(self: T, method=None):
         pass

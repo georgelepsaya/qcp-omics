@@ -20,12 +20,30 @@ class QCMixin:
 
     def _impute_mean(self: T) -> None:
         imputer = SimpleImputer(strategy="mean")
-        self.data_numeric[:] = imputer.fit_transform(self.data_numeric)
+        data_numerical = self.data.select_dtypes(include=["float", "int"])
+        imputed_values = imputer.fit_transform(data_numerical)
+        imputed_df = pd.DataFrame(
+            imputed_values,
+            columns=data_numerical.columns,
+            index=data_numerical.index
+        )
+        self.data[data_numerical.columns] = imputed_df
+        for col in data_numerical.columns:
+            self.data[col] = self.data[col].astype(data_numerical[col].dtype)
 
 
     def _impute_mode(self: T) -> None:
         imputer = SimpleImputer(strategy="most_frequent")
-        self.data_categorical[:] = imputer.fit_transform(self.data_categorical)
+        data_categorical = self.data.select_dtypes(include=["category"])
+        imputed_values = imputer.fit_transform(data_categorical)
+        imputed_df = pd.DataFrame(
+            imputed_values,
+            columns=data_categorical.columns,
+            index=data_categorical.index
+        )
+        self.data[data_categorical.columns] = imputed_df
+        for col in data_categorical.columns:
+            self.data[col] = self.data[col].astype('category')
 
 
     @staticmethod
@@ -57,40 +75,35 @@ class QCMixin:
 
 
     def _detect_outliers(self: T, method="iqr") -> dict[str, list[tuple]]:
+        data_numerical = self.data.select_dtypes(include=["float", "int"])
         if method == "zscore":
-            outliers = self._detect_outliers_zscore(self.data_numeric)
+            outliers = self._detect_outliers_zscore(data_numerical)
         else:
-            outliers = self._detect_outliers_iqr(self.data_numeric)
+            outliers = self._detect_outliers_iqr(data_numerical)
         return outliers
 
 
     @report_step(output=True)
     def identify_missing_values(self: T, method=None) -> dict[Any, float]:
-        return self._identify_missing_values(self.data_numeric) | self._identify_missing_values(self.data_categorical)
+        return self._identify_missing_values(self.data)
 
 
-    @report_step(snapshot=True)
+    @report_step(snapshot="combined")
     def handle_missing_values(self: T, method="impute_mean"):
-        miss_cols_num = self._identify_missing_values(self.data_numeric)
-        miss_cols_cat = self._identify_missing_values(self.data_categorical)
-        for col, miss in miss_cols_num.items():
+        miss_cols = self._identify_missing_values(self.data)
+        for col, miss in miss_cols.items():
             if miss >= 30:
                 self.data.drop(col, axis=1, inplace=True)
-                self.data_numeric.drop(col, axis=1, inplace=True)
-        for col, miss in miss_cols_cat.items():
-            if miss >= 30:
-                self.data.drop(col, axis=1, inplace=True)
-                self.data_categorical.drop(col, axis=1, inplace=True)
         self._impute_mode()
         if method == "impute_mean":
             self._impute_mean()
 
 
-    @report_step(snapshot=True, output=True)
+    @report_step(snapshot="combined", output=True)
     def handle_outliers(self: T, method="iqr") -> dict[str, list[tuple]]:
         outliers = self._detect_outliers(method=method)
         for col, outliers_list in outliers.items():
-            median_value = self.data_numeric[col].median()
+            median_value = self.data[col].median()
             for index, _ in outliers_list:
-                self.data_numeric.at[index, col] = median_value
+                self.data.at[index, col] = median_value
         return outliers

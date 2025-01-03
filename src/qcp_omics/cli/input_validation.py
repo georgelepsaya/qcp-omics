@@ -24,7 +24,7 @@ class Input(BaseModel):
     target_feature: str
     features_cols: bool
     en_header: bool
-    all_numeric: bool
+    all_numerical: bool
     is_raw: bool
     dtypes: dict[str, str]
     steps_to_run: list[dict[str, str]]

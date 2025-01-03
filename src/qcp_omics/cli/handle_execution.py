@@ -33,19 +33,18 @@ def instantiate_input(metadata: dict[str, t.Any]) -> Input:
 def handle_execution(metadata: dict[str, t.Any]) -> None:
     metadata_model = instantiate_input(metadata)
     data = load_dataset(metadata_model.dataset_path)
-    metadata = metadata_model.model_dump()
+    valid_metadata = metadata_model.model_dump()
     dataset_type_to_class = {
         "clinical": ClinicalData,
         "genomics": GenomicsData,
         "proteomics": ProteomicsData
     }
-    dataset_model_class = dataset_type_to_class.get(metadata_model.dataset_type, {})
+    dataset_model_class = dataset_type_to_class.get(valid_metadata['dataset_type'], {})
     if not dataset_model_class:
-        raise ValueError(f"Unsupported dataset type: {metadata['dataset_type']}")
+        raise ValueError(f"Unsupported dataset type: {valid_metadata['dataset_type']}")
 
-    data_model = dataset_model_class(data, metadata)
+    data_model = dataset_model_class(data, valid_metadata)
     data_model.transpose()
     data_model.map_dtypes()
-    data_model.split_numeric_categorical()
     data_model.execute_steps()
-    generate_html_report(data_model.report_data, metadata, metadata["report_path"])
+    generate_html_report(data_model.report_data, valid_metadata, valid_metadata["report_path"])

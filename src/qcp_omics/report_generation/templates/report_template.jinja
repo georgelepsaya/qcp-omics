@@ -51,14 +51,28 @@
             {% include "quality_control/handle_missing_values.jinja" %}
         {% elif data[i].step == "handle_outliers" %}
             {% include "quality_control/handle_outliers.jinja" %}
-        {% elif data[i].step == "transform" %}
-            {% include "preprocessing/transform_features.jinja" %}
-        {% elif data[i].step == "scale_features" %}
+        {% elif data[i].step == "split_train_test" %}
+            {% include "preprocessing/split_train_test.jinja" %}
+        {% elif data[i].step == "split_numerical_categorical" %}
+            {% include "preprocessing/split_num_cat.jinja" %}
+        {% elif data[i].step == "scale_numerical_features" %}
             {% include "preprocessing/scale_features.jinja" %}
+        {% elif data[i].step == "remove_highly_correlated_features" %}
+            {% include "preprocessing/handle_correlated_features.jinja" %}
+        {% elif data[i].step == "create_new_features" %}
+            {% include "preprocessing/create_new_features.jinja" %}
+        {% elif data[i].step == "transform_numerical_features" %}
+            {% include "preprocessing/transform_features.jinja" %}
         {% elif data[i].step == "dimensionality_reduction" %}
             {% include "preprocessing/dimensionality_reduction.jinja" %}
         {% elif data[i].step == "descriptive_statistics" %}
             {% include "analysis/descriptive_statistics.jinja" %}
+        {% elif data[i].step == "pairwise_correlations_numerical" %}
+            {% include "analysis/pairwise_correlations_numerical.jinja" %}
+        {% elif data[i].step == "evaluate_distribution_target" %}
+            {% include "analysis/evaluate_distribution_target.jinja" %}
+        {% elif data[i].step == "evaluate_distribution_features" %}
+            {% include "analysis/evaluate_distribution_features.jinja" %}
         {% endif %}
     {% endfor %}
 </div>

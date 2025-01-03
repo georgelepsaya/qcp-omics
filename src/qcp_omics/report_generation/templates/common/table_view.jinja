@@ -1,0 +1,17 @@
+{% if data[i].data_snapshot_type == "split" %}
+<h3 class="fs-6">Dataset snapshot - numerical features</h3>
+<div class="table-responsive overflow-auto mb-4" style="max-height: 400px;">
+    {{ data[i].data_snapshot[0] }}
+</div>
+<h3 class="fs-6">Dataset snapshot - categorical features</h3>
+<div class="table-responsive overflow-auto mb-4" style="max-height: 400px;">
+    {{ data[i].data_snapshot[1] }}
+</div>
+{% elif data[i].data_snapshot_type in ["combined", "numerical", "categorical"] %}
+<h3 class="fs-6">Dataset snapshot</h3>
+<div class="table-responsive overflow-auto mb-4" style="max-height: 400px;">
+    {{ data[i].data_snapshot }}
+</div>
+{% else %}
+    <p>No dataset snapshot found.</p>
+{% endif %}

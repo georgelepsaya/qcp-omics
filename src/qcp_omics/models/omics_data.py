@@ -1,14 +1,13 @@
 from abc import ABC
-from typing import Tuple, Optional
+from typing import Optional
 import pandas as pd
-import json
-
 
 class OmicsData(ABC):
     def __init__(self, data: pd.DataFrame, metadata: dict) -> None:
         self.data = data
-        self.data_numeric: Optional[pd.DataFrame] = None
+        self.data_numerical: Optional[pd.DataFrame] = None
         self.data_categorical: Optional[pd.DataFrame] = None
+        self.test_set: Optional[pd.DataFrame] = None
         self.metadata = metadata
         self.report_data: list[dict] = []
 
@@ -25,10 +24,7 @@ class OmicsData(ABC):
 
     def map_dtypes(self) -> None:
         print("Mapping the dtypes from metadata with the dataset")
-        metadata_path = self.metadata["metadata_path"]
-        with open(metadata_path, "r") as f:
-            mappings = json.load(f)
-        dtype_mapping = mappings.get("dtypes", {})
+        dtype_mapping = self.metadata["dtypes"]
         for col, dtype in dtype_mapping.items():
             if col in self.data.columns:
                 if dtype == "category":
@@ -39,15 +35,15 @@ class OmicsData(ABC):
                     self.data[col] = self.data[col].astype("float")
 
 
-    def split_numeric_categorical(self):
-        self.data_numeric = self.data.select_dtypes(include=["float", "int"])
-        self.data_categorical = self.data.select_dtypes(include=["category"])
+    # def split_numeric_categorical(self):
+    #     self.data_numeric = self.data.select_dtypes(include=["float", "int"])
+    #     self.data_categorical = self.data.select_dtypes(include=["category"])
 
 
-    def _visualize_data_snapshot(self) -> Tuple[str, str]:
-        html_table_num = self.data_numeric.to_html(classes="table table-striped table-bordered table-hover")
-        html_table_cat = self.data_categorical.to_html(classes="table table-striped table-bordered table-hover")
-        return html_table_num, html_table_cat
+    @staticmethod
+    def _visualize_data_snapshot(df: pd.DataFrame) -> str:
+        html_table = df.to_html(classes="table table-striped table-bordered table-hover")
+        return html_table
 
 
     def execute_steps(self) -> None:

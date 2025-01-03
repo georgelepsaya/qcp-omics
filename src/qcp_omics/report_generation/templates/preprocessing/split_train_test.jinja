@@ -1,0 +1,10 @@
+{% extends "common/step.jinja" %}
+{% block step_content %}
+    <h3 class="fs-5">Test set</h3>
+    <h3 class="fs-6">Data snapshot</h3>
+    <div class="table-responsive overflow-auto mb-4" style="max-height: 400px;">
+        {{ data[i].output }}
+    </div>
+    <h3 class="fs-5">Train set</h3>
+    {% include "common/table_view.jinja" %}
+{% endblock %}
