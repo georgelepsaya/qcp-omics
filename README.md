@@ -1,5 +1,7 @@
 # QCP-Omics
 
+![Tests](https://github.com/georgelepsaya/qcp-omics/actions/workflows/tests.yaml/badge.svg)
+
 ## 1. Before you run the tool
 
 ### 1.1. Prepare metadata
