@@ -263,16 +263,16 @@ def test_en_header_invalid_rows(minimal_valid_input, tmp_path):
 
 # TESTS FOR DTYPES
 
-def test_dtypes_column_not_in_dataset(minimal_valid_input):
+def test_dtypes_column_not_in_dtypes(minimal_valid_input):
     bad_input = minimal_valid_input.copy()
     bad_input["dtypes"] = {"NotARealColumn": "str"}
-    with pytest.raises(ValidationError, match="column 'NotARealColumn' not found"):
+    with pytest.raises(ValidationError, match="column 'col1' not found"):
         Input(**bad_input)
 
 
 def test_dtypes_invalid_dtype(minimal_valid_input):
     bad_input = minimal_valid_input.copy()
-    bad_input["dtypes"] = {"col1": "invalid_dtype"}
+    bad_input["dtypes"] = {"col1": "invalid_dtype", "col2": "str"}
     with pytest.raises(ValidationError, match="invalid dtype 'invalid_dtype'"):
         Input(**bad_input)
 

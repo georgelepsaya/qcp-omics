@@ -173,6 +173,10 @@ class Input(BaseModel):
             df = df.T
         valid_dtypes = {"int", "float", "str", "object", "bool", "category"}
 
+        for col in df.columns:
+            if col not in self.dtypes.keys():
+                raise ValueError(f"dtypes error: column '{col}' not found in dtypes.")
+
         for col_name, dtype_str in self.dtypes.items():
             if col_name not in df.columns:
                 raise ValueError(f"dtypes error: column '{col_name}' not found in dataset.")

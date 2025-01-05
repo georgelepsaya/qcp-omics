@@ -98,7 +98,6 @@ class QCMixin:
             return
         for col, miss in miss_cols.items():
             if miss >= 30:
-                print("here 2")
                 self.data.drop(col, axis=1, inplace=True)
         self._impute_mode()
         self._impute_mean()
