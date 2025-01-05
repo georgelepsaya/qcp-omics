@@ -1,5 +1,10 @@
 {% extends "common/step.jinja" %}
 {% block step_content %}
+    <h3 class="fs-5">Description</h3>
+    <p>This sections show how the dataset was split into a test and a train set. 20% of
+    the dataset went to the test set, and 80% - to the train set. Below are the tables
+    showing a snapshot of each of the sets.
+    </p>
     <h3 class="fs-5">Test set</h3>
     <h3 class="fs-6">Data snapshot</h3>
     <div class="table-responsive overflow-auto mb-4" style="max-height: 400px;">
@@ -7,4 +12,6 @@
     </div>
     <h3 class="fs-5">Train set</h3>
     {% include "common/table_view.jinja" %}
+    <p>Test set is captured in its current state. All further steps are performed on
+    the train split of the dataset.</p>
 {% endblock %}

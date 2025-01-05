@@ -1,7 +1,10 @@
 {% extends "common/step.jinja" %}
 {% block step_content %}
+    <h3 class="fs-5">Description</h3>
     <p>
-        Below is a snapshot of the dataset after this step.
+        In this step the numerical subset of the dataset is transformed with method
+        <b>{{ data[i].method }}</b>. Below is a snapshot of the dataset after transformation
+        is performed.
     </p>
     {% include "common/table_view.jinja" %}
 {% endblock %}

@@ -63,9 +63,16 @@ def report_step(
             else:
                 final_output = result
 
+            method_name: Optional[str] = None
+
+            for step in self.metadata["steps_to_run"]:
+                if step["step"] == step_name:
+                    method_name = step.get("method", None)
+
             # Append the step information to the report
             self.report_data.append({
                 "step": step_name,
+                "method": method_name,
                 "data_snapshot": data_snapshot,
                 "data_snapshot_type": snapshot,
                 "output": final_output if output else None

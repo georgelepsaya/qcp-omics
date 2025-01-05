@@ -1,7 +1,9 @@
 {% extends "common/step.jinja" %}
 {% block step_content %}
+    <h3 class="fs-5">Description</h3>
     <p>
-        Below is a list of outliers found for each feature of the dataset.
+        Outliers have been detected with method <b>{{ data[i].method }}</b>.
+    Below is the list of outliers found for every column.
     </p>
     <ol class="list-group list-group-numbered overflow-auto" style="max-height: 600px;">
         {% for k, v in data[i].output["outliers"].items() %}
@@ -17,11 +19,15 @@
             </li>
         {% endfor %}
     </ol>
-    <p>Box plots</p>
+    <p>Below are box plots showing how data is distributed for every column with quantiles
+    and detected outliers.
+    </p>
+    <h4 class="fs-6">Box plots</h4>
     <div class="d-flex justify-content-center overflow-auto">
     {{ data[i].output["boxplots"] }}
     </div>
     <p>
+        Outliers then have been replaced with a <b>median</b> value of the column.
         Below is the dataset after handling outliers.
     </p>
     {% include "common/table_view.jinja" %}

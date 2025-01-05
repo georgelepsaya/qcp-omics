@@ -1,7 +1,12 @@
 {% extends "common/step.jinja" %}
 {% block step_content %}
+    <h3 class="fs-5">Description</h3>
     <p>
-        Below are snapshots of the dataset after this step.
+        Missing values identified in the previous step have been handles. Columns with <b>critical
+        missingness</b> have been <b>dropped</b>. <b>Numerical</b> columns with acceptable missingess have been
+        imputed with a <b>mean value</b>. <b>Categorical</b> columns with acceptable missingness have been imputed
+        with the <b>most frequent value</b>.
+        Below is a snapshot of the dataset after running this step.
     </p>
     {% include "common/table_view.jinja" %}
 {% endblock %}

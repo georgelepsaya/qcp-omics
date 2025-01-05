@@ -1,6 +1,11 @@
 {% extends "common/step.jinja" %}
 {% block step_content %}
-    <h3 class="fs-5">Descriptive statistics of numerical variables of the dataset</h3>
+    <h3 class="fs-5">Description</h3>
+    <p>
+        In this step some basic descriptive statistics is gathered about the dataset, including
+    kurtosis and skewness, for every variable. Below is the table with those findings.
+    </p>
+    <h4 class="fs-6">Descriptive statistics of numerical variables of the dataset</h4>
     <div class="table-responsive overflow-auto mb-4" style="max-height: 400px;">
         {{ data[i].output }}
     </div>

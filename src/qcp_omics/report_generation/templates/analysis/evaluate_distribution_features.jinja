@@ -1,5 +1,12 @@
 {% extends "common/step.jinja" %}
 {% block step_content %}
+    <h3 class="fs-5">Description</h3>
+    <p>
+    In this step analysis of distributions of the numerical variables is performed. Below are
+    distribution plots for every variable of the numerical dataset, which help us assess the
+    kurtosis and skewness of the numerical variables.
+    </p>
+    <h4 class="fs-6">Distribution plots</h4>
     <div class="d-flex justify-content-center overflow-auto">
     {{ data[i].output["hist_plots"] }}
     </div>

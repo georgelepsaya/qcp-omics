@@ -4,7 +4,8 @@ from qcp_omics.models.clinical_data import ClinicalData
 
 
 metadata_base = {
-    "dtypes": {"Num1": "int", "Num2": "int", "Cat1": "category"}
+    "dtypes": {"Num1": "int", "Num2": "int", "Cat1": "category"},
+    "steps_to_run": [{"step": "identify_missing_values"}]
 }
 
 

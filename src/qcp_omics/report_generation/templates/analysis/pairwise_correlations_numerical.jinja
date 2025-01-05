@@ -1,9 +1,16 @@
 {% extends "common/step.jinja" %}
 {% block step_content %}
-    <h3 class="fs-5">Correlation matrix of numerical variables</h3>
+    <h3 class="fs-5">Description</h3>
+    <p>
+    In this step correlation analysis of the numerical dataset is performed with method.
+        Below is a correlation matrix with correlation coefficients calculated with
+        <b>{{ data[i].method }}</b> method.
+    </p>
+    <h4 class="fs-6">Correlation matrix of numerical variables</h4>
     <div class="table-responsive overflow-auto mb-4" style="max-height: 400px;">
         {{ data[i].output["corr_matrix"] }}
     </div>
+    <p>Below is a heatmap visualising pairwise correlations of the numerical dataset.</p>
     <div class="d-flex justify-content-center overflow-auto">
     {{ data[i].output["heatmap"] }}
     </div>

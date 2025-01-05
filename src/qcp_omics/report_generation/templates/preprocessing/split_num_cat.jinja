@@ -1,4 +1,8 @@
 {% extends "common/step.jinja" %}
 {% block step_content %}
+    <h3 class="fs-5">Description</h3>
+    <p>In this step the dataset is split into a numerical and categorical subsets based
+    on `dtypes` provided in the metadata input. Below is the result of a split performed.
+    </p>
 {% include "common/table_view.jinja" %}
 {% endblock %}
