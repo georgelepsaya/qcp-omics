@@ -1,7 +1,7 @@
 FROM python:3.11-slim
 
 LABEL maintainer="Georgy Lepsaya"
-LABEL version="1.0"
+LABEL version="1.1"
 LABEL description="Container for QCP-Omics"
 
 
@@ -12,3 +12,4 @@ WORKDIR /app
 
 
 ENTRYPOINT ["qcp"]
+

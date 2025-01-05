@@ -2,30 +2,63 @@ import click
 import pandas as pd
 import os
 import json
-from typing import Any
+from typing import Any, List, Dict
 
 
-def load_dataset(dataset_path) -> pd.DataFrame:
-    dataset_path = dataset_path
+def load_dataset(dataset_path: str) -> pd.DataFrame:
+    """
+    Load a dataset from a file path, supporting CSV and TSV formats.
+
+    Args:
+        dataset_path (str): Path to the dataset file.
+
+    Returns:
+        pd.DataFrame: Loaded dataset as a pandas DataFrame.
+
+    Raises:
+        ValueError: If the file extension is not supported.
+    """
     _, ext = os.path.splitext(dataset_path)
     sep = "," if ext == ".csv" else "\t"
-    df = pd.read_table(dataset_path, sep=sep, index_col=0)
-    return df
+    if ext not in [".csv", ".tsv"]:
+        raise ValueError(f"Unsupported file extension: {ext}")
+
+    return pd.read_table(dataset_path, sep=sep, index_col=0)
 
 
-def handle_json_input(input_path: str) -> dict[str, Any]:
+def handle_json_input(input_path: str) -> Dict[str, Any]:
+    """
+    Load and validate a JSON metadata file.
+
+    Args:
+        input_path (str): Path to the JSON file.
+
+    Returns:
+        Dict[str, Any]: Parsed JSON data.
+
+    Raises:
+        click.UsageError: If the file is not a valid JSON file or cannot be read.
+    """
     _, ext = os.path.splitext(input_path)
     if ext != ".json":
         raise click.UsageError("Metadata file must be a JSON file.")
     try:
-        with open(input_path, "r") as f:
-            input_metadata = json.load(f)
+        with open(input_path, "r", encoding="utf-8") as f:
+            return json.load(f)
     except Exception as e:
         raise click.UsageError(f"Could not open file: {e}")
-    return input_metadata
 
 
-def prompt_already_run_steps(active_steps: list[dict[str, Any]]) -> list[str]:
+def prompt_already_run_steps(active_steps: List[Dict[str, Any]]) -> List[str]:
+    """
+    Prompt the user to select steps that have already been run.
+
+    Args:
+        active_steps (List[Dict[str, Any]]): List of active steps.
+
+    Returns:
+        List[str]: Names of steps already run, as chosen by the user.
+    """
     if not active_steps:
         return []
 
@@ -53,16 +86,35 @@ def prompt_already_run_steps(active_steps: list[dict[str, Any]]) -> list[str]:
 
 
 def remove_previous_steps(
-    active_steps: list[dict[str, Any]],
-    previous_steps: list[str]
+        active_steps: List[Dict[str, Any]],
+        previous_steps: List[str]
 ) -> None:
+    """
+    Remove previously run steps from the active steps list.
+
+    Args:
+        active_steps (List[Dict[str, Any]]): List of active steps.
+        previous_steps (List[str]): Steps to remove.
+    """
     active_steps[:] = [
         step_dict for step_dict in active_steps
         if step_dict["step"] not in previous_steps
     ]
 
 
-def prompt_steps_to_run(active_steps: list[dict[str, Any]]) -> list[int]:
+def prompt_steps_to_run(active_steps: List[Dict[str, Any]]) -> List[int]:
+    """
+    Prompt the user to select steps to run from a list of active steps.
+
+    Args:
+        active_steps (List[Dict[str, Any]]): List of active steps.
+
+    Returns:
+        List[int]: Indices of steps to run.
+
+    Raises:
+        click.BadParameter: If the user input is invalid.
+    """
     if not active_steps:
         click.echo("No active steps to run.")
         return []
@@ -72,25 +124,21 @@ def prompt_steps_to_run(active_steps: list[dict[str, Any]]) -> list[int]:
         click.echo(f"{i}. {step_dict['step']}")
 
     prompt_text = (
-        "\nEnter 'all' to run all steps, or "
-        "'N' for a single step, or 'start-end' for a range (e.g., 1-3)."
+        "\nEnter 'all' to run all steps, or 'N' for a single step, or 'start-end' for a range (e.g., 1-3)."
     )
-    user_input = click.prompt(prompt_text, type=str)
+    user_input = click.prompt(prompt_text, type=str).strip().lower()
 
-    user_input = user_input.strip().lower()
     max_index = len(active_steps)
 
     if user_input == "all":
         return list(range(max_index))
 
-    # Check if it's a single integer, e.g. "3"
     if user_input.isdigit():
         num = int(user_input)
         if not 1 <= num <= max_index:
             raise click.BadParameter(f"Step number must be between 1 and {max_index}")
         return [num - 1]
 
-    # Check if it's a range "start-end"
     if "-" in user_input:
         parts = user_input.split("-")
         if len(parts) != 2:
@@ -106,17 +154,24 @@ def prompt_steps_to_run(active_steps: list[dict[str, Any]]) -> list[int]:
         if start_idx > end_idx:
             raise click.BadParameter("Start of range cannot be larger than end of range.")
 
-        # Convert to 0-based
         return list(range(start_idx - 1, end_idx))
 
     raise click.BadParameter("Invalid input. Please enter 'all', or a single number, or 'start-end'.")
 
 
-def prompt_methods_if_needed(step_dict: dict[str, Any]) -> dict[str, Any]:
+def prompt_methods_if_needed(step_dict: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Prompt the user to select a method for a given step, if applicable.
+
+    Args:
+        step_dict (Dict[str, Any]): A dictionary containing step information.
+
+    Returns:
+        Dict[str, Any]: The step information, potentially including the chosen method.
+    """
     step_name = step_dict["step"]
     step_methods = step_dict.get("methods")
 
-    # If no methods or it's not a list, just return {"step": step_name}
     if not step_methods or not isinstance(step_methods, list):
         return {"step": step_name}
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qcp-omics"
-version = "0.1.1"
+version = "0.1.2"
 description = "Quality control, preprocessing and analysis of omics data for machine learning"
 authors = ["Georgy Lepsaya <georgelepsaya@gmail.com>"]
 license = "MIT"

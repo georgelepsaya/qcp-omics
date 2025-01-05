@@ -5,38 +5,49 @@ from sklearn.decomposition import PCA
 from scipy.stats import boxcox
 import numpy as np
 from qcp_omics.report_generation.report_step import report_step
-from typing import TypeVar, Optional
+from typing import TypeVar, Optional, Dict
 from qcp_omics.utils.protocols import HasData
-
 
 T = TypeVar("T", bound=HasData)
 
-
 class PreprocessingMixin:
+    """
+    A mixin class for preprocessing data, including splitting datasets, scaling,
+    transforming features, and applying dimensionality reduction techniques.
+    """
+
     @report_step(snapshot="combined", output=True)
-    def split_train_test(self: T, method=None) -> pd.DataFrame:
+    def split_train_test(self: T) -> pd.DataFrame:
+        """
+        Split the dataset into training and testing sets.
+
+        Returns:
+            pd.DataFrame: The test set.
+        """
         train_set, test_set = train_test_split(self.data, test_size=0.2, random_state=42)
         self.test_set = test_set
         self.data = train_set
         return test_set
 
-
     @report_step(snapshot="split")
-    def split_numerical_categorical(self: T, method=None) -> None:
+    def split_numerical_categorical(self: T) -> None:
+        """
+        Split the dataset into numerical and categorical subsets.
+        """
         self.data_numerical = self.data.select_dtypes(include=["float", "int"])
         self.data_categorical = self.data.select_dtypes(include=["category"])
 
-
     @report_step(snapshot="numerical")
-    def scale_numerical_features(self: T, method="standard_scaler") -> None:
-        if method == "standard_scaler":
-            scaler = StandardScaler()
-        elif method == "robust_scaler":
-            scaler = RobustScaler()
-        else:
-            raise ValueError(f"Unsupported scaling method: {method}")
+    def scale_numerical_features(self: T, method: str = "standard_scaler") -> None:
+        """
+        Scale numerical features using the specified scaling method.
 
-        if len(self.data_numerical.columns) == 0:
+        Args:
+            method (str): The scaling method to use ("standard_scaler" or "robust_scaler").
+        """
+        scaler = StandardScaler() if method == "standard_scaler" else RobustScaler()
+
+        if self.data_numerical.empty:
             return
 
         self.data_numerical = pd.DataFrame(
@@ -45,9 +56,17 @@ class PreprocessingMixin:
             index=self.data_numerical.index,
         )
 
-
     @report_step(snapshot="numerical")
-    def transform_numerical_features(self: T, method="box-cox") -> None:
+    def transform_numerical_features(self: T, method: str = "box-cox") -> None:
+        """
+        Transform numerical features using the specified method.
+
+        Args:
+            method (str): The transformation method to use ("box-cox" or "log2").
+
+        Raises:
+            ValueError: If the transformation method is unsupported.
+        """
         min_val = self.data_numerical.min().min()
         if min_val <= 0:
             shift = abs(min_val) + 1
@@ -66,11 +85,16 @@ class PreprocessingMixin:
         else:
             raise ValueError(f"Unsupported transformation method: {method}")
 
+    def _run_pca(self: T) -> Optional[Dict[str, np.ndarray]]:
+        """
+        Perform Principal Component Analysis (PCA) on numerical features.
 
-    def _run_pca(self: T) -> Optional[dict]:
-
-        if len(self.data_numerical.columns) == 0:
-            return
+        Returns:
+            Optional[Dict[str, np.ndarray]]: A dictionary containing PCA results and explained variance metrics,
+            or None if there are no numerical features.
+        """
+        if self.data_numerical.empty:
+            return None
 
         pca = PCA()
         pca.fit(self.data_numerical)
@@ -85,16 +109,21 @@ class PreprocessingMixin:
             "cumulative_var": cumulative_var
         }
 
-
     @report_step(output=True)
-    def dimensionality_reduction(self: T, method=None):
+    def dimensionality_reduction(self: T) -> Optional[Dict[str, any]]:
+        """
+        Apply dimensionality reduction using PCA and generate relevant visualizations.
+
+        Returns:
+            Optional[Dict[str, any]]: A dictionary containing PCA data, explained variance plot, and PCA plot.
+        """
         result = self._run_pca()
 
         if result is None:
-            return
+            return None
 
         pca_data, per_var, cumulative_var = result.values()
-        exp_variance_plot = self._explained_variance(cumulative_var)
+        exp_variance_plot = self._explained_variance(cumulative_var) if hasattr(self, '_explained_variance') else None
 
         n_components = pca_data.shape[1]
         columns = [f"PC{i + 1}" for i in range(n_components)]
@@ -105,7 +134,7 @@ class PreprocessingMixin:
             columns=columns
         )
 
-        pca_plot = self._pca_plot(df_pca, per_var)
+        pca_plot = self._pca_plot(df_pca, per_var) if hasattr(self, '_pca_plot') else None
 
         return {
             "pca_data": df_pca,

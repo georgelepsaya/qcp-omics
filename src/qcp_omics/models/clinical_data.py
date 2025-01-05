@@ -6,4 +6,36 @@ from qcp_omics.mixins.visualization_mixin import VisualizationMixin
 
 
 class ClinicalData(OmicsData, QCMixin, PreprocessingMixin, AnalysisMixin, VisualizationMixin):
-    pass
+    """
+    Represents clinical data, combining functionality for quality control,
+    preprocessing, analysis, and visualization.
+
+    Inherits from:
+    - `OmicsData`: Base class for handling omics data.
+    - `QCMixin`: Adds quality control functionality.
+    - `PreprocessingMixin`: Adds preprocessing tools and methods.
+    - `AnalysisMixin`: Adds data analysis functionality.
+    - `VisualizationMixin`: Adds data visualization tools and methods.
+
+    This class allows for custom implementations of functions in mixins, or new functions.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        """
+        Initializes the ClinicalData object. Passes all arguments to the `OmicsData` initializer.
+
+        Args:
+            *args: Positional arguments passed to the `OmicsData` initializer.
+            **kwargs: Keyword arguments passed to the `OmicsData` initializer.
+        """
+        super().__init__(*args, **kwargs)
+
+    def __repr__(self) -> str:
+        """
+        Provides a string representation of the ClinicalData object for debugging and logging purposes.
+
+        Returns:
+            str: A string describing the ClinicalData object.
+        """
+        return f"<ClinicalData: {super().__repr__()}>"
+

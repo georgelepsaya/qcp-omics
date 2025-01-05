@@ -4,7 +4,7 @@ from .metadata import metadata
 
 
 @click.group()
-def qcp():
+def qcp() -> None:
     """Welcome to QCP-Omics."""
     pass
 
