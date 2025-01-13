@@ -126,16 +126,16 @@ All steps must be provided **in the exact order** listed below:
 1. `identify_missing_values`
 2. `handle_missing_values`
 3. `handle_outliers` *(method required)*
-  - Methods: *IQR*, *zscore*
+    - Methods: *IQR*, *zscore*
 5. `split_train_test`
 6. `split_numerical_categorical`
 7. `scale_numerical_features` *(method required)*
-  - Methods: *standard_scaler*, *robust_scaler*
+    - Methods: *standard_scaler*, *robust_scaler*
 8. `transform_numerical_features` *(method required)*
-  - Methods: *box-cox*, *log2*
+    - Methods: *box-cox*, *log2*
 9. `descriptive_statistics`
 10. `pairwise_correlations_numerical` *(method required)*
-  - Methods: *pearson*, *spearman*
+    - Methods: *pearson*, *spearman*
 11. `evaluate_distribution_features`
 12. `dimensionality_reduction`
 
