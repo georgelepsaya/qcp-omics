@@ -113,8 +113,7 @@ In this mode, the entire pipeline is executed automatically based on the provide
   "dtypes": {
     "age": "int",
     "death": "category",
-    "bmi_num": "float",
-    ...
+    "bmi_num": "float"
   }
 }
 ```
