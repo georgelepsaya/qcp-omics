@@ -23,13 +23,11 @@ Requires Python version >= 3.11.
 
 # QCP-Omics Usage
 
-[TOC]
-
-# Metadata File Guide for qcp-omics
+# Metadata File Guide
 
 ## Overview
 
-The `qcp-omics` tool (`qcp`) provides powerful capabilities for preprocessing and analyzing omics datasets. This guide explains how to create a metadata file required for running the tool in both interactive and metadata modes.
+This guide explains how to create a metadata file required for running the tool in both interactive and metadata modes.
 
 ## Modes of Operation
 
@@ -43,7 +41,7 @@ qcp interactive
 In this mode, users interactively input metadata through CLI prompts, except for data types (`dtypes`). The required JSON file must contain the `dtypes` field to specify the data types of dataset columns.
 
 **Requirements:**
-- Only the `dtypes` field is required; all other metadata will be collected during CLI interaction.
+- Only the `dtypes` field is required. All other metadata will be collected during CLI interaction.
 - Data types must be supported by pandas (e.g., `int`, `float`, `category`).
 
 **Example `dtypes` JSON:**
@@ -64,7 +62,7 @@ In this mode, users interactively input metadata through CLI prompts, except for
 qcp metadata path/to/metadata.json
 ```
 
-In this mode, the entire preprocessing and analysis pipeline is executed automatically based on the provided metadata JSON file.
+In this mode, the entire pipeline is executed automatically based on the provided metadata JSON file.
 
 **Requirements:**
 - All metadata fields must be fully specified.
@@ -91,9 +89,9 @@ In this mode, the entire preprocessing and analysis pipeline is executed automat
 
 ```json
 {
-  "dataset_type": "genomics",
-  "dataset_path": "data/genomics_data.csv",
-  "metadata_path": "metadata/config.json",
+  "dataset_type": "clinical",
+  "dataset_path": "data/clinical_data.csv",
+  "metadata_path": "metadata.json",
   "output_path": "results/",
   "report_path": "results/",
   "features_cols": true,
@@ -113,8 +111,10 @@ In this mode, the entire preprocessing and analysis pipeline is executed automat
     { "step": "dimensionality_reduction" }
   ],
   "dtypes": {
-    "gene_expression": "float",
-    "sample_id": "category"
+    "age": "int",
+    "death": "category",
+    "bmi_num": "float",
+    ...
   }
 }
 ```
@@ -126,18 +126,22 @@ All steps must be provided **in the exact order** listed below:
 
 1. `identify_missing_values`
 2. `handle_missing_values`
-3. `handle_outliers` *(method required, e.g., `IQR`)*
-4. `split_train_test`
-5. `split_numerical_categorical`
-6. `scale_numerical_features` *(method required, e.g., `standard_scaler`)*
-7. `transform_numerical_features` *(method required, e.g., `box-cox`)*
-8. `descriptive_statistics`
-9. `pairwise_correlations_numerical` *(method required, e.g., `pearson`)*
-10. `evaluate_distribution_features`
-11. `dimensionality_reduction`
+3. `handle_outliers` *(method required)*
+  - Methods: *IQR*, *zscore*
+5. `split_train_test`
+6. `split_numerical_categorical`
+7. `scale_numerical_features` *(method required)*
+  - Methods: *standard_scaler*, *robust_scaler*
+8. `transform_numerical_features` *(method required)*
+  - Methods: *box-cox*, *log2*
+9. `descriptive_statistics`
+10. `pairwise_correlations_numerical` *(method required)*
+  - Methods: *pearson*, *spearman*
+11. `evaluate_distribution_features`
+12. `dimensionality_reduction`
 
 ### Partial Pipeline (when `is_raw` is `false`)
-Users can select any subset of steps but must maintain the **original order**. For example:
+Users can select any subset of steps but must maintain the **original order**. For example (imagine steps are numbered):
 
 - Valid: `[3, 5, 6, 9]` → `handle_outliers`, `split_numerical_categorical`, `scale_numerical_features`, `pairwise_correlations_numerical`
 - Invalid: `[3, 6, 5]` → `handle_outliers`, `scale_numerical_features`, `split_numerical_categorical` (Incorrect order)
@@ -148,15 +152,4 @@ Users can select any subset of steps but must maintain the **original order**. F
   - `train_dataset.csv` and `test_dataset.csv` saved in `output_path`
 - **Report:**
   - `report.html` saved in `report_path`
-
-## Notes
-
-- Ensure that all paths in the metadata JSON are correct and accessible.
-- Data types in `dtypes` must align with pandas-supported types.
-- Preprocessing steps must respect the defined sequence to maintain pipeline integrity.
-
----
-
-For more information, visit the official documentation or reach out to the development team.
-
 
