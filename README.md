@@ -1,6 +1,6 @@
 # QCP-Omics
 
-![Tests](https://github.com/georgelepsaya/qcp-omics/actions/workflows/tests.yaml/badge.svg)
+![Tests are passing](https://github.com/georgelepsaya/qcp-omics/actions/workflows/tests.yaml/badge.svg)
 
 
 ## Installation
