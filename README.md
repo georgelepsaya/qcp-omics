@@ -19,10 +19,6 @@ Requires Python version >= 3.11.
 3. Install the tool: `pip install qcp-omics`
 4. Verify installation: `qcp`
 
-## Instructions
-
-# QCP-Omics Usage
-
 # Metadata File Guide
 
 ## Overview
