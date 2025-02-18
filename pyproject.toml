@@ -26,6 +26,10 @@ pytest = "^8.3.4"
 pytest-cov = "^6.0.0"
 tox = "^4.23.2"
 
+[[tool.mypy.overrides]]
+module = ["qcp_omics.*"]
+ignore_missing_imports = true
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
